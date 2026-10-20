@@ -1043,11 +1043,15 @@
       updateAuthUI();
       renderAll();
       checkShareLink();
+
+      // Creator session uses sessionStorage — automatically cleared when the tab/window is closed.
+      // Refreshing the page keeps the session; closing the tab signs out.
     }
 
     function loadAuth() {
-      isCreator = localStorage.getItem(AUTH_KEY) === '1';
-      // Ensure a password exists
+      // Session-only auth: signs out automatically when the tab/window is closed
+      isCreator = sessionStorage.getItem(AUTH_KEY) === '1';
+      // Ensure a password exists (persistent)
       if (!localStorage.getItem(PASS_KEY)) {
         localStorage.setItem(PASS_KEY, DEFAULT_PASSWORD);
       }
@@ -1233,7 +1237,7 @@
 
     function signOut() {
       isCreator = false;
-      localStorage.removeItem(AUTH_KEY);
+      sessionStorage.removeItem(AUTH_KEY);
       updateAuthUI();
       document.getElementById('authModal').classList.remove('open');
       document.getElementById('detailModal').classList.remove('open');
@@ -1246,7 +1250,7 @@
 
       if (pass === stored) {
         isCreator = true;
-        localStorage.setItem(AUTH_KEY, '1');
+        sessionStorage.setItem(AUTH_KEY, '1');
         document.getElementById('authModal').classList.remove('open');
         updateAuthUI();
         showToast('Signed in as Creator. You can now edit projects.');
