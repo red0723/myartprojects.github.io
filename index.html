@@ -550,6 +550,53 @@
       .modal-body { padding: 1.3rem 1.2rem; }
       .upload-btn span { display: none; }
     }
+
+    /* ========== AUTH ========== */
+    .auth-bar {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .auth-status {
+      font-size: 0.8rem; color: var(--text-muted);
+      padding: 0.3rem 0.7rem; border-radius: 999px;
+      background: var(--bg-soft); border: 1px solid var(--border);
+    }
+    .auth-status.signed-in {
+      background: rgba(91, 138, 122, 0.15);
+      border-color: var(--accent-2); color: var(--accent-2);
+    }
+    .auth-btn {
+      background: var(--bg-soft); border: 1px solid var(--border);
+      height: 42px; padding: 0 1rem; border-radius: 999px;
+      display: flex; align-items: center; gap: 0.4rem;
+      cursor: pointer; font-size: 0.88rem; font-weight: 500;
+      transition: all var(--transition); color: var(--text);
+      font-family: var(--font-body);
+    }
+    .auth-btn:hover {
+      background: var(--accent); color: white; border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .auth-modal-box {
+      padding: 2rem;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .auth-modal-box h2 {
+      font-family: var(--font-display); font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .auth-modal-box p {
+      color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.4rem;
+    }
+    .readonly-banner {
+      background: var(--bg-soft); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 0.7rem 1.1rem;
+      margin-bottom: 1.2rem; font-size: 0.88rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .readonly-banner strong { color: var(--text); }
+    body:not(.is-creator) .creator-only { display: none !important; }
+
   </style>
 </head>
 <body>
@@ -562,8 +609,12 @@
       <button class="nav-btn" data-view="favorites">♥ Favorites</button>
     </nav>
     <div class="header-actions">
-      <button class="icon-btn" id="exportBtn" title="Export / Backup as JSON">⬇</button>
-      <button class="upload-btn" id="openUpload" title="Add new project">＋ <span>Add Project</span></button>
+      <div class="auth-bar">
+        <span class="auth-status" id="authStatus">Viewer</span>
+        <button class="auth-btn" id="authBtn">Sign in</button>
+      </div>
+      <button class="icon-btn creator-only" id="exportBtn" title="Export / Backup as JSON">⬇</button>
+      <button class="upload-btn creator-only" id="openUpload" title="Add new project">＋ <span>Add Project</span></button>
       <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
     </div>
   </header>
@@ -765,18 +816,49 @@
     </div>
   </div>
 
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal" style="max-width:420px;">
+      <button class="modal-close" id="closeAuth">×</button>
+      <div class="auth-modal-box">
+        <h2 id="authModalTitle">Creator Sign In</h2>
+        <p id="authModalDesc">Enter your creator password to add projects, moderate comments, and manage your portfolio.</p>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="Enter password" autocomplete="current-password" />
+        </div>
+        <div class="form-group" id="setPasswordGroup" style="display:none;">
+          <label>New Password</label>
+          <input type="password" id="newPassword" placeholder="Choose a new password" />
+        </div>
+        <div class="form-actions" style="justify-content:stretch;">
+          <button class="btn btn-primary" id="authSubmit" style="flex:1;">Sign In</button>
+        </div>
+        <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);text-align:center;">
+          Default password: <code>creator</code> · You can change it after signing in.
+        </p>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
   <button class="back-to-top" id="backToTop" title="Back to top">↑</button>
 
   <script>
     const STORAGE_KEY = 'myArtProjects_v2';
     const FAV_KEY = 'myArtFavorites_v2';
+    const AUTH_KEY = 'myArtAuth_v1';
+    const PASS_KEY = 'myArtPass_v1';
+    const DEFAULT_PASSWORD = 'creator';
+
     let projects = [];
     let favorites = new Set();
     let currentProjectId = null;
     let uploadedFiles = [];
     let activeTagFilters = { 'my-art': new Set(), 'ai-art': new Set() };
     let currentImageIndex = 0;
+    let isCreator = false;
 
     // Expanded moderation list
     const BAD_WORDS = [
@@ -787,11 +869,75 @@
 
     function init() {
       loadData();
+      loadAuth();
       if (projects.length === 0) seedSampleData();
       setupEventListeners();
       applyTheme();
+      updateAuthUI();
       renderAll();
       checkShareLink();
+    }
+
+    function loadAuth() {
+      isCreator = localStorage.getItem(AUTH_KEY) === '1';
+      // Ensure a password exists
+      if (!localStorage.getItem(PASS_KEY)) {
+        localStorage.setItem(PASS_KEY, DEFAULT_PASSWORD);
+      }
+    }
+
+    function updateAuthUI() {
+      const status = document.getElementById('authStatus');
+      const btn = document.getElementById('authBtn');
+      if (isCreator) {
+        document.body.classList.add('is-creator');
+        status.textContent = 'Creator';
+        status.classList.add('signed-in');
+        btn.textContent = 'Sign out';
+      } else {
+        document.body.classList.remove('is-creator');
+        status.textContent = 'Viewer';
+        status.classList.remove('signed-in');
+        btn.textContent = 'Sign in';
+      }
+    }
+
+    function openAuthModal() {
+      if (isCreator) {
+        // Sign out
+        isCreator = false;
+        localStorage.removeItem(AUTH_KEY);
+        updateAuthUI();
+        // Close detail if open so mod panel updates
+        document.getElementById('detailModal').classList.remove('open');
+        showToast('Signed out. You are now in viewer mode.');
+        return;
+      }
+      document.getElementById('authPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('setPasswordGroup').style.display = 'none';
+      document.getElementById('authModalTitle').textContent = 'Creator Sign In';
+      document.getElementById('authModalDesc').textContent = 'Enter your creator password to add projects, moderate comments, and manage your portfolio.';
+      document.getElementById('authSubmit').textContent = 'Sign In';
+      document.getElementById('authModal').classList.add('open');
+      setTimeout(() => document.getElementById('authPassword').focus(), 100);
+    }
+
+    function submitAuth() {
+      const pass = document.getElementById('authPassword').value;
+      const stored = localStorage.getItem(PASS_KEY) || DEFAULT_PASSWORD;
+
+      if (pass === stored) {
+        isCreator = true;
+        localStorage.setItem(AUTH_KEY, '1');
+        document.getElementById('authModal').classList.remove('open');
+        updateAuthUI();
+        showToast('Signed in as Creator. You can now edit projects.');
+      } else {
+        showToast('Incorrect password.');
+        document.getElementById('authPassword').value = '';
+        document.getElementById('authPassword').focus();
+      }
     }
 
     function loadData() {
@@ -1060,6 +1206,23 @@
       renderComments(p);
       renderModPanel(p);
       document.getElementById('shareBanner').style.display = 'none';
+
+      // Readonly banner for viewers
+      let banner = document.getElementById('readonlyBanner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'readonlyBanner';
+        banner.className = 'readonly-banner';
+        const actions = document.querySelector('.modal-actions');
+        if (actions) actions.parentNode.insertBefore(banner, actions.nextSibling);
+      }
+      if (!isCreator) {
+        banner.style.display = 'flex';
+        banner.innerHTML = '👁 <span><strong>Viewer mode</strong> — You can rate and comment. Sign in as Creator to edit projects.</span>';
+      } else {
+        banner.style.display = 'none';
+      }
+
       document.getElementById('detailModal').classList.add('open');
     }
 
@@ -1114,6 +1277,10 @@
 
     function renderModPanel(p) {
       const panel = document.getElementById('modPanel');
+      if (!isCreator) {
+        panel.style.display = 'none';
+        return;
+      }
       const hiddenOrReported = (p.comments || []).filter(c => c.hidden || c.reported);
       if (!hiddenOrReported.length) {
         panel.style.display = 'none';
@@ -1183,6 +1350,7 @@
     }
 
     function approveComment(commentId) {
+      if (!isCreator) { showToast('Sign in as Creator to moderate comments.'); return; }
       const p = projects.find(x => x.id === currentProjectId);
       if (!p) return;
       const c = (p.comments || []).find(x => x.id === commentId);
@@ -1197,6 +1365,7 @@
     }
 
     function deleteComment(commentId) {
+      if (!isCreator) { showToast('Sign in as Creator to moderate comments.'); return; }
       const p = projects.find(x => x.id === currentProjectId);
       if (!p) return;
       p.comments = (p.comments || []).filter(x => x.id !== commentId);
@@ -1240,6 +1409,11 @@
 
     // ========== UPLOAD ==========
     function openUpload() {
+      if (!isCreator) {
+        showToast('Sign in as Creator to add projects.');
+        openAuthModal();
+        return;
+      }
       uploadedFiles = [];
       document.getElementById('previewImages').innerHTML = '';
       document.getElementById('projectTitle').value = '';
@@ -1310,6 +1484,10 @@
 
     // ========== EXPORT ==========
     function exportJSON() {
+      if (!isCreator) {
+        showToast('Sign in as Creator to export data.');
+        return;
+      }
       const data = {
         exportedAt: new Date().toISOString(),
         projects,
@@ -1374,6 +1552,16 @@
       document.getElementById('themeToggle').addEventListener('click', toggleTheme);
       document.getElementById('exportBtn').addEventListener('click', exportJSON);
       document.getElementById('openUpload').addEventListener('click', openUpload);
+
+      // Auth
+      document.getElementById('authBtn').addEventListener('click', openAuthModal);
+      document.getElementById('closeAuth').addEventListener('click', () => {
+        document.getElementById('authModal').classList.remove('open');
+      });
+      document.getElementById('authSubmit').addEventListener('click', submitAuth);
+      document.getElementById('authPassword').addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitAuth();
+      });
       document.getElementById('closeUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
       document.getElementById('cancelUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
       document.getElementById('closeDetail').addEventListener('click', () => document.getElementById('detailModal').classList.remove('open'));
