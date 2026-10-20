@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Light Mode - Warm Studio */
       --bg: #f8f4ef;
       --bg-card: #ffffff;
       --bg-soft: #f0e9e0;
@@ -24,7 +23,9 @@
       --radius-sm: 10px;
       --font-display: 'Cormorant Garamond', serif;
       --font-body: 'Inter', sans-serif;
-      --transition: 0.25s ease;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 0.45s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     [data-theme="dark"] {
@@ -40,11 +41,7 @@
       --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: var(--font-body);
@@ -52,870 +49,559 @@
       color: var(--text);
       line-height: 1.6;
       min-height: 100vh;
-      transition: background var(--transition), color var(--transition);
+      transition: background var(--transition-slow), color var(--transition-slow);
     }
 
-    /* ========== HEADER ========== */
+    /* HEADER */
     .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
       background: rgba(248, 244, 239, 0.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0.9rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      transition: background var(--transition);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      transition: background var(--transition-slow), border-color var(--transition);
     }
-
-    [data-theme="dark"] .header {
-      background: rgba(26, 22, 20, 0.92);
-    }
+    [data-theme="dark"] .header { background: rgba(26, 22, 20, 0.92); }
 
     .logo {
-      font-family: var(--font-display);
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.02em;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+      font-family: var(--font-display); font-size: 1.7rem; font-weight: 700;
+      color: var(--accent); letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 0.5rem;
     }
+    .logo span { font-weight: 400; color: var(--text-muted); font-size: 1.1rem; }
 
-    .logo span {
-      font-weight: 400;
-      color: var(--text-muted);
-      font-size: 1.1rem;
-    }
-
-    .nav {
-      display: flex;
-      gap: 0.4rem;
-      flex-wrap: wrap;
-    }
+    .nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
     .nav-btn {
-      background: transparent;
-      border: none;
-      padding: 0.55rem 1.1rem;
-      border-radius: 999px;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all var(--transition);
-      font-family: var(--font-body);
+      background: transparent; border: none;
+      padding: 0.55rem 1.1rem; border-radius: 999px;
+      font-size: 0.95rem; font-weight: 500; color: var(--text-muted);
+      cursor: pointer; transition: all var(--transition); font-family: var(--font-body);
+      position: relative;
     }
-
-    .nav-btn:hover {
-      background: var(--bg-soft);
-      color: var(--text);
-    }
-
+    .nav-btn:hover { background: var(--bg-soft); color: var(--text); }
     .nav-btn.active {
-      background: var(--accent);
-      color: white;
+      background: var(--accent); color: white;
+      box-shadow: 0 4px 14px rgba(196, 92, 62, 0.35);
     }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
+    .header-actions { display: flex; align-items: center; gap: 0.6rem; }
 
-    .theme-toggle, .upload-btn {
-      background: var(--bg-soft);
-      border: 1px solid var(--border);
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1.15rem;
-      transition: all var(--transition);
+    .icon-btn, .upload-btn {
+      background: var(--bg-soft); border: 1px solid var(--border);
+      height: 42px; border-radius: 999px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 1.05rem;
+      transition: all var(--transition), transform var(--transition-fast);
       color: var(--text);
     }
-
-    .theme-toggle:hover, .upload-btn:hover {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
+    .icon-btn { width: 42px; }
+    .icon-btn:hover, .upload-btn:hover {
+      background: var(--accent); color: white; border-color: var(--accent);
+      transform: translateY(-2px);
     }
+    .icon-btn:active, .upload-btn:active { transform: translateY(0) scale(0.96); }
+    .upload-btn { padding: 0 1.1rem; font-size: 0.9rem; font-weight: 500; gap: 0.4rem; }
 
-    .upload-btn {
-      width: auto;
-      padding: 0 1.1rem;
-      border-radius: 999px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      gap: 0.4rem;
-    }
-
-    /* ========== MAIN LAYOUT ========== */
-    .container {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
-    }
-
+    /* MAIN */
+    .container { max-width: 1280px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
     .view {
       display: none;
-      animation: fadeIn 0.35s ease;
+      opacity: 0;
+      transform: translateY(12px);
     }
-
     .view.active {
       display: block;
+      animation: viewIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
+    @keyframes viewIn {
+      from { opacity: 0; transform: translateY(14px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    /* ========== DASHBOARD ========== */
-    .dashboard-header {
-      margin-bottom: 2.5rem;
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    @keyframes heartBeat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.25); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.15); }
+      100% { transform: scale(1); }
     }
 
+    .dashboard-header { margin-bottom: 2rem; }
     .dashboard-header h1 {
-      font-family: var(--font-display);
-      font-size: 2.6rem;
-      font-weight: 600;
-      margin-bottom: 0.4rem;
+      font-family: var(--font-display); font-size: 2.5rem; font-weight: 600; margin-bottom: 0.35rem;
     }
-
-    .dashboard-header p {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-    }
+    .dashboard-header p { color: var(--text-muted); font-size: 1.05rem; }
 
     .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.1rem; margin-bottom: 2.2rem;
     }
-
     .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.4rem 1.5rem;
-      box-shadow: var(--shadow);
-      transition: transform var(--transition);
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.3rem 1.4rem; box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
-
+    .stat-card:nth-child(1) { animation-delay: 0.05s; }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.15s; }
+    .stat-card:nth-child(4) { animation-delay: 0.2s; }
+    .stat-card:nth-child(5) { animation-delay: 0.25s; }
     .stat-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px); box-shadow: 0 12px 28px rgba(44,36,32,0.1);
+      border-color: var(--accent-soft);
     }
-
     .stat-card .label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.25rem;
+      text-transform: uppercase; letter-spacing: 0.04em;
     }
-
     .stat-card .value {
-      font-family: var(--font-display);
-      font-size: 2.2rem;
-      font-weight: 600;
-      color: var(--accent);
+      font-family: var(--font-display); font-size: 2.1rem; font-weight: 600; color: var(--accent);
     }
 
     .section-title {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      font-weight: 600;
-      margin-bottom: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
+      font-family: var(--font-display); font-size: 1.55rem; font-weight: 600;
+      margin: 2rem 0 1.1rem; display: flex; align-items: center; gap: 0.6rem;
     }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    .section-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* ========== GALLERY CONTROLS ========== */
+    /* CONTROLS */
     .gallery-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1.8rem;
-      align-items: center;
+      display: flex; flex-wrap: wrap; gap: 0.8rem; margin-bottom: 1.6rem; align-items: center;
     }
-
-    .search-box {
-      flex: 1;
-      min-width: 220px;
-      position: relative;
-    }
-
+    .search-box { flex: 1; min-width: 200px; position: relative; }
     .search-box input {
-      width: 100%;
-      padding: 0.7rem 1rem 0.7rem 2.6rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg-card);
-      color: var(--text);
-      font-size: 0.95rem;
-      font-family: var(--font-body);
-      outline: none;
-      transition: border-color var(--transition);
+      width: 100%; padding: 0.7rem 1rem 0.7rem 2.6rem;
+      border: 1px solid var(--border); border-radius: 999px;
+      background: var(--bg-card); color: var(--text); font-size: 0.95rem;
+      font-family: var(--font-body); outline: none;
     }
-
-    .search-box input:focus {
-      border-color: var(--accent);
-    }
-
+    .search-box input:focus { border-color: var(--accent); }
     .search-box::before {
-      content: '🔍';
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.95rem;
-      opacity: 0.6;
+      content: '🔍'; position: absolute; left: 1rem; top: 50%;
+      transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6;
     }
-
-    .filter-select {
-      padding: 0.7rem 1.1rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg-card);
-      color: var(--text);
-      font-size: 0.9rem;
-      font-family: var(--font-body);
-      cursor: pointer;
-      outline: none;
+    .filter-select, .filter-chip {
+      padding: 0.65rem 1rem; border: 1px solid var(--border); border-radius: 999px;
+      background: var(--bg-card); color: var(--text); font-size: 0.88rem;
+      font-family: var(--font-body); cursor: pointer; outline: none;
     }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--bg-soft); transition: all var(--transition), transform var(--transition-fast);
+    }
+    .filter-chip.active {
+      background: var(--accent); color: white; border-color: var(--accent);
+      box-shadow: 0 3px 10px rgba(196, 92, 62, 0.3);
+    }
+    .filter-chip:hover { border-color: var(--accent); transform: translateY(-1px); }
 
-    /* ========== ARTWORK GRID ========== */
+    .advanced-filters {
+      display: none; width: 100%; padding: 1rem;
+      background: var(--bg-soft); border-radius: var(--radius-sm);
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.7rem; align-items: center;
+      opacity: 0; transform: translateY(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .advanced-filters.open {
+      display: flex; opacity: 1; transform: translateY(0);
+      animation: fadeUp 0.3s ease forwards;
+    }
+    .tag-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+    /* CARDS */
     .artwork-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.6rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.5rem;
     }
-
     .art-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform var(--transition), box-shadow var(--transition);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      cursor: pointer; display: flex; flex-direction: column; position: relative;
+      animation: fadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
-
+    .art-card:nth-child(1) { animation-delay: 0.03s; }
+    .art-card:nth-child(2) { animation-delay: 0.07s; }
+    .art-card:nth-child(3) { animation-delay: 0.11s; }
+    .art-card:nth-child(4) { animation-delay: 0.15s; }
+    .art-card:nth-child(5) { animation-delay: 0.19s; }
+    .art-card:nth-child(6) { animation-delay: 0.23s; }
+    .art-card:nth-child(n+7) { animation-delay: 0.27s; }
     .art-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 16px 40px rgba(44, 36, 32, 0.12);
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 18px 40px rgba(44,36,32,0.14);
+      border-color: var(--accent-soft);
+    }
+    [data-theme="dark"] .art-card:hover {
+      box-shadow: 0 18px 40px rgba(0,0,0,0.4);
     }
 
     .art-card-image {
-      position: relative;
-      aspect-ratio: 4/3;
-      overflow: hidden;
-      background: var(--bg-soft);
+      position: relative; aspect-ratio: 4/3; overflow: hidden; background: var(--bg-soft);
     }
-
     .art-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
-    .art-card:hover .art-card-image img {
-      transform: scale(1.05);
-    }
+    .art-card:hover .art-card-image img { transform: scale(1.06); }
 
     .art-card-badge {
-      position: absolute;
-      top: 0.8rem;
-      left: 0.8rem;
-      background: rgba(0,0,0,0.65);
-      color: white;
-      font-size: 0.72rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      font-weight: 500;
-      backdrop-filter: blur(4px);
+      position: absolute; top: 0.7rem; left: 0.7rem;
+      background: rgba(0,0,0,0.65); color: white; font-size: 0.7rem;
+      padding: 0.22rem 0.55rem; border-radius: 999px; font-weight: 500;
+    }
+    .art-card-badge.ai { background: rgba(91, 138, 122, 0.9); }
+
+    .multi-badge {
+      position: absolute; bottom: 0.7rem; right: 0.7rem;
+      background: rgba(0,0,0,0.6); color: white; font-size: 0.72rem;
+      padding: 0.2rem 0.5rem; border-radius: 6px;
     }
 
-    .art-card-badge.ai {
-      background: rgba(91, 138, 122, 0.9);
+    .fav-btn {
+      position: absolute; top: 0.7rem; right: 0.7rem;
+      background: rgba(255,255,255,0.92); border: none; width: 34px; height: 34px;
+      border-radius: 50%; font-size: 1rem; cursor: pointer; z-index: 5;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+      color: #ccc;
     }
+    .fav-btn.favorited { color: #e74c3c; animation: heartBeat 0.45s ease; }
+    .fav-btn:hover { transform: scale(1.15); }
+    [data-theme="dark"] .fav-btn { background: rgba(42,36,32,0.9); }
 
-    .art-card-body {
-      padding: 1.2rem 1.3rem 1.4rem;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
+    .art-card-body { padding: 1.15rem 1.25rem 1.3rem; flex: 1; display: flex; flex-direction: column; }
     .art-card-title {
-      font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 600;
-      margin-bottom: 0.35rem;
-      line-height: 1.3;
+      font-family: var(--font-display); font-size: 1.3rem; font-weight: 600;
+      margin-bottom: 0.3rem; line-height: 1.3;
     }
-
-    .art-card-meta {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.8rem;
-    }
-
-    .art-card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 1rem;
-    }
-
+    .art-card-meta { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.7rem; }
+    .art-card-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.9rem; }
     .tag {
-      background: var(--bg-soft);
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
+      background: var(--bg-soft); color: var(--text-muted); font-size: 0.72rem;
+      padding: 0.18rem 0.55rem; border-radius: 999px;
     }
-
     .art-card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: auto;
-      padding-top: 0.8rem;
-      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto; padding-top: 0.7rem; border-top: 1px solid var(--border);
     }
+    .stars { color: #e8b923; font-size: 0.9rem; letter-spacing: 1px; }
+    .comment-count { font-size: 0.82rem; color: var(--text-muted); }
 
-    .stars {
-      color: #e8b923;
-      font-size: 0.95rem;
-      letter-spacing: 1px;
-    }
+    .empty-state { text-align: center; padding: 3.5rem 2rem; color: var(--text-muted); grid-column: 1 / -1; }
+    .empty-state .icon { font-size: 3.2rem; margin-bottom: 0.8rem; opacity: 0.45; }
+    .empty-state h3 { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 0.4rem; color: var(--text); }
 
-    .comment-count {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 4rem 2rem;
-      color: var(--text-muted);
-    }
-
-    .empty-state .icon {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      opacity: 0.5;
-    }
-
-    .empty-state h3 {
-      font-family: var(--font-display);
-      font-size: 1.6rem;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-
-    /* ========== MODAL ========== */
+    /* MODAL */
     .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(26, 22, 20, 0.65);
-      backdrop-filter: blur(6px);
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      opacity: 0;
-      transition: opacity 0.25s ease;
+      position: fixed; inset: 0; background: rgba(26,22,20,0.68);
+      backdrop-filter: blur(8px); z-index: 200;
+      display: none; align-items: center; justify-content: center;
+      padding: 1.2rem; opacity: 0;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     .modal-overlay.open {
-      display: flex;
-      opacity: 1;
+      display: flex; opacity: 1;
     }
 
     .modal {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      width: 100%;
-      max-width: 720px;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
-      position: relative;
-      animation: modalIn 0.3s ease;
+      background: var(--bg-card); border-radius: var(--radius);
+      width: 100%; max-width: 780px; max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3); position: relative;
+      transform: scale(0.94) translateY(12px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34, 1.2, 0.64, 1), opacity 0.3s ease;
     }
-
-    @keyframes modalIn {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+      opacity: 1;
     }
 
     .modal-close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: var(--bg-soft);
-      border: none;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-      color: var(--text);
-      z-index: 5;
-      transition: background var(--transition);
+      position: absolute; top: 0.9rem; right: 0.9rem;
+      background: var(--bg-soft); border: none; width: 36px; height: 36px;
+      border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: var(--text); z-index: 10;
+    }
+    .modal-close:hover { background: var(--accent); color: white; }
+
+    /* Image gallery in modal */
+    .modal-gallery { position: relative; background: var(--bg-soft); }
+    .modal-main-img {
+      width: 100%; max-height: 380px; object-fit: contain; display: block; margin: 0 auto;
+      background: #111;
+      transition: opacity 0.3s ease;
+    }
+    .modal-main-img.fading { opacity: 0.4; }
+    .thumb-strip {
+      display: flex; gap: 0.5rem; padding: 0.7rem; overflow-x: auto;
+      background: var(--bg-soft); justify-content: center;
+    }
+    .thumb-strip img {
+      width: 64px; height: 64px; object-fit: cover; border-radius: 8px;
+      cursor: pointer; border: 2px solid transparent; opacity: 0.65;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .thumb-strip img.active, .thumb-strip img:hover {
+      border-color: var(--accent); opacity: 1; transform: scale(1.06);
     }
 
-    .modal-close:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .modal-image {
-      width: 100%;
-      max-height: 360px;
-      object-fit: cover;
-      background: var(--bg-soft);
-    }
-
-    .modal-body {
-      padding: 1.8rem 2rem 2.2rem;
-    }
-
+    .modal-body { padding: 1.6rem 1.8rem 2rem; }
     .modal-title {
-      font-family: var(--font-display);
-      font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
+      font-family: var(--font-display); font-size: 1.9rem; font-weight: 600; margin-bottom: 0.4rem;
     }
+    .modal-meta { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1rem; }
 
-    .modal-meta {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 1.2rem;
+    .modal-actions {
+      display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.3rem;
     }
+    .action-btn {
+      background: var(--bg-soft); border: 1px solid var(--border);
+      padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.85rem;
+      cursor: pointer; color: var(--text); font-family: var(--font-body);
+      display: flex; align-items: center; gap: 0.35rem; transition: all var(--transition);
+    }
+    .action-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .action-btn.favorited { background: #fde8e6; border-color: #e74c3c; color: #e74c3c; }
 
     .rating-section {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.2rem;
     }
-
     .star-btn {
-      background: none;
-      border: none;
-      font-size: 1.6rem;
-      cursor: pointer;
-      color: #ccc;
-      transition: color 0.15s, transform 0.15s;
-      padding: 0;
+      background: none; border: none; font-size: 1.5rem; cursor: pointer;
+      color: #ccc; transition: color 0.2s, transform 0.2s cubic-bezier(0.34, 1.4, 0.64, 1); padding: 0;
     }
-
-    .star-btn.filled {
-      color: #e8b923;
-    }
-
-    .star-btn:hover {
-      transform: scale(1.15);
-    }
+    .star-btn.filled { color: #e8b923; }
+    .star-btn:hover { transform: scale(1.2); }
+    .star-btn:active { transform: scale(0.9); }
 
     .comments-section h3 {
-      font-family: var(--font-display);
-      font-size: 1.3rem;
-      margin-bottom: 1rem;
+      font-family: var(--font-display); font-size: 1.25rem; margin-bottom: 0.9rem;
     }
-
     .comment-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-      max-height: 220px;
-      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.9rem;
+      margin-bottom: 1.3rem; max-height: 240px; overflow-y: auto;
     }
-
     .comment {
-      background: var(--bg-soft);
-      padding: 0.9rem 1.1rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.92rem;
+      background: var(--bg-soft); padding: 0.85rem 1rem; border-radius: var(--radius-sm);
+      font-size: 0.9rem; position: relative;
     }
-
-    .comment.hidden-comment {
-      opacity: 0.5;
-      font-style: italic;
-    }
-
+    .comment.hidden-comment { opacity: 0.45; font-style: italic; border-left: 3px solid #e74c3c; }
+    .comment.reported { border-left: 3px solid #f39c12; }
     .comment-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 0.3rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
+      display: flex; justify-content: space-between; margin-bottom: 0.25rem;
+      font-size: 0.78rem; color: var(--text-muted);
     }
-
-    .comment-form {
-      display: flex;
-      gap: 0.7rem;
+    .comment-actions {
+      display: flex; gap: 0.5rem; margin-top: 0.4rem;
     }
+    .comment-actions button {
+      background: none; border: none; font-size: 0.75rem; color: var(--text-muted);
+      cursor: pointer; padding: 0;
+    }
+    .comment-actions button:hover { color: var(--accent); }
 
+    .comment-form { display: flex; gap: 0.6rem; }
     .comment-form input {
-      flex: 1;
-      padding: 0.75rem 1.1rem;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      outline: none;
+      flex: 1; padding: 0.7rem 1rem; border: 1px solid var(--border);
+      border-radius: 999px; background: var(--bg); color: var(--text);
+      font-family: var(--font-body); font-size: 0.92rem; outline: none;
     }
-
-    .comment-form input:focus {
-      border-color: var(--accent);
-    }
-
+    .comment-form input:focus { border-color: var(--accent); }
     .comment-form button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0 1.3rem;
-      border-radius: 999px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background var(--transition);
-      font-family: var(--font-body);
+      background: var(--accent); color: white; border: none;
+      padding: 0 1.2rem; border-radius: 999px; font-weight: 500;
+      cursor: pointer; font-family: var(--font-body);
     }
+    .comment-form button:hover { background: var(--accent-soft); }
 
-    .comment-form button:hover {
-      background: var(--accent-soft);
-    }
-
-    /* ========== UPLOAD MODAL ========== */
-    .upload-form {
-      padding: 2rem;
-    }
-
+    /* UPLOAD */
+    .upload-form { padding: 1.8rem; }
     .upload-form h2 {
-      font-family: var(--font-display);
-      font-size: 1.8rem;
-      margin-bottom: 1.5rem;
+      font-family: var(--font-display); font-size: 1.7rem; margin-bottom: 1.3rem;
     }
-
-    .form-group {
-      margin-bottom: 1.3rem;
-    }
-
+    .form-group { margin-bottom: 1.15rem; }
     .form-group label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 0.4rem;
-      color: var(--text-muted);
+      display: block; font-size: 0.88rem; font-weight: 500;
+      margin-bottom: 0.35rem; color: var(--text-muted);
     }
-
     .form-group input[type="text"],
     .form-group input[type="number"],
     .form-group select,
     .form-group textarea {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color var(--transition);
+      width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--bg); color: var(--text);
+      font-family: var(--font-body); font-size: 0.92rem; outline: none;
     }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: var(--accent);
-    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
 
     .drop-zone {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem 1.5rem;
-      text-align: center;
-      cursor: pointer;
-      transition: all var(--transition);
-      background: var(--bg-soft);
-      margin-bottom: 1.3rem;
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 2.2rem 1.4rem; text-align: center; cursor: pointer;
+      transition: all var(--transition); background: var(--bg-soft); margin-bottom: 1rem;
     }
-
-    .drop-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(196, 92, 62, 0.08);
-    }
-
-    .drop-zone p {
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-    }
-
-    .drop-zone .icon {
-      font-size: 2.5rem;
-      opacity: 0.5;
-    }
+    .drop-zone.dragover { border-color: var(--accent); background: rgba(196,92,62,0.08); }
+    .drop-zone p { color: var(--text-muted); margin-top: 0.4rem; font-size: 0.88rem; }
+    .drop-zone .icon { font-size: 2.3rem; opacity: 0.5; }
 
     .preview-images {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-      margin-top: 1rem;
+      display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 0.8rem;
+    }
+    .preview-item {
+      position: relative; width: 88px; height: 88px;
+    }
+    .preview-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+    }
+    .preview-item .remove-img {
+      position: absolute; top: -6px; right: -6px;
+      background: #e74c3c; color: white; border: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      font-size: 0.75rem; cursor: pointer; line-height: 1;
     }
 
-    .preview-images img {
-      width: 90px;
-      height: 90px;
-      object-fit: cover;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-actions {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: flex-end;
-      margin-top: 1.8rem;
+      display: flex; gap: 0.7rem; justify-content: flex-end; margin-top: 1.5rem;
     }
-
     .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 999px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border: none;
-      font-family: var(--font-body);
+      padding: 0.7rem 1.4rem; border-radius: 999px; font-weight: 500;
+      font-size: 0.92rem; cursor: pointer; border: none; font-family: var(--font-body);
       transition: all var(--transition);
     }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-soft);
-    }
-
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-soft); }
     .btn-secondary {
-      background: var(--bg-soft);
-      color: var(--text);
-      border: 1px solid var(--border);
+      background: var(--bg-soft); color: var(--text); border: 1px solid var(--border);
     }
+    .btn-secondary:hover { background: var(--border); }
 
-    .btn-secondary:hover {
-      background: var(--border);
-    }
-
-    /* ========== TOAST ========== */
+    /* TOAST & BACK TO TOP */
     .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--text);
-      color: var(--bg);
-      padding: 0.9rem 1.4rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      box-shadow: var(--shadow);
-      z-index: 300;
-      transform: translateY(100px);
-      opacity: 0;
-      transition: all 0.3s ease;
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--text); color: var(--bg);
+      padding: 0.85rem 1.3rem; border-radius: var(--radius-sm);
+      font-size: 0.92rem; box-shadow: var(--shadow); z-index: 300;
+      transform: translateY(80px) scale(0.95); opacity: 0;
+      transition: all 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
     }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
 
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    /* ========== BACK TO TOP ========== */
     .back-to-top {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: white;
-      border: none;
-      font-size: 1.3rem;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      opacity: 0;
-      pointer-events: none;
-      transition: all var(--transition);
-      z-index: 50;
+      position: fixed; bottom: 2rem; right: 2rem; width: 46px; height: 46px;
+      border-radius: 50%; background: var(--accent); color: white; border: none;
+      font-size: 1.25rem; cursor: pointer; box-shadow: var(--shadow);
+      opacity: 0; pointer-events: none; transform: translateY(12px) scale(0.9);
+      transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1); z-index: 50;
     }
-
     .back-to-top.visible {
-      opacity: 1;
-      pointer-events: auto;
+      opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
     }
-
     .back-to-top:hover {
-      transform: translateY(-3px);
-      background: var(--accent-soft);
+      transform: translateY(-4px) scale(1.05); background: var(--accent-soft);
     }
 
-    /* ========== RESPONSIVE ========== */
+    /* SHARE BANNER */
+    .share-banner {
+      background: var(--accent-2); color: white; padding: 0.7rem 1.2rem;
+      border-radius: var(--radius-sm); margin-bottom: 1.2rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      font-size: 0.9rem;
+    }
+    .share-banner button {
+      background: white; color: var(--accent-2); border: none;
+      padding: 0.35rem 0.9rem; border-radius: 999px; font-weight: 500;
+      cursor: pointer; font-size: 0.85rem;
+    }
+
+    /* MODERATION PANEL */
+    .mod-panel {
+      background: #fff8e6; border: 1px solid #f0d78c; border-radius: var(--radius-sm);
+      padding: 1rem; margin-bottom: 1.2rem; font-size: 0.88rem;
+    }
+    [data-theme="dark"] .mod-panel {
+      background: #3a3220; border-color: #6b5a30;
+    }
+    .mod-panel h4 { margin-bottom: 0.5rem; font-size: 0.95rem; }
+
     @media (max-width: 768px) {
-      .header {
-        flex-wrap: wrap;
-        padding: 0.8rem 1rem;
-      }
-
-      .logo {
-        font-size: 1.4rem;
-      }
-
-      .nav {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        margin-top: 0.5rem;
-      }
-
-      .dashboard-header h1 {
-        font-size: 2rem;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-body {
-        padding: 1.4rem 1.3rem;
-      }
-
-      .upload-btn span {
-        display: none;
-      }
-    }
-
-    /* Watermark simulation (visual only) */
-    .watermarked::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 40px,
-        rgba(255,255,255,0.03) 40px,
-        rgba(255,255,255,0.03) 80px
-      );
-      pointer-events: none;
+      .header { flex-wrap: wrap; padding: 0.75rem 1rem; }
+      .logo { font-size: 1.35rem; }
+      .nav { order: 3; width: 100%; justify-content: center; margin-top: 0.4rem; }
+      .dashboard-header h1 { font-size: 1.9rem; }
+      .form-row { grid-template-columns: 1fr; }
+      .modal-body { padding: 1.3rem 1.2rem; }
+      .upload-btn span { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- HEADER -->
   <header class="header">
-    <div class="logo">
-      MyArt<span>Projects</span>
-    </div>
+    <div class="logo">MyArt<span>Projects</span></div>
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard">Dashboard</button>
       <button class="nav-btn" data-view="my-art">My Art</button>
       <button class="nav-btn" data-view="ai-art">AI + My Art</button>
+      <button class="nav-btn" data-view="favorites">♥ Favorites</button>
     </nav>
     <div class="header-actions">
-      <button class="upload-btn" id="openUpload" title="Add new project">
-        ＋ <span>Add Project</span>
-      </button>
-      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
+      <button class="icon-btn" id="exportBtn" title="Export / Backup as JSON">⬇</button>
+      <button class="upload-btn" id="openUpload" title="Add new project">＋ <span>Add Project</span></button>
+      <button class="icon-btn" id="themeToggle" title="Toggle theme">🌙</button>
     </div>
   </header>
 
   <main class="container">
-    <!-- DASHBOARD VIEW -->
+    <!-- DASHBOARD -->
     <section id="dashboard" class="view active">
       <div class="dashboard-header">
         <h1>Welcome to your studio</h1>
         <p>Organize, showcase, and celebrate your creative journey.</p>
       </div>
-
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="label">Total Projects</div>
-          <div class="value" id="statTotal">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">My Art</div>
-          <div class="value" id="statMyArt">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">AI-Assisted</div>
-          <div class="value" id="statAI">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Avg Rating</div>
-          <div class="value" id="statAvg">—</div>
-        </div>
+        <div class="stat-card"><div class="label">Total Projects</div><div class="value" id="statTotal">0</div></div>
+        <div class="stat-card"><div class="label">My Art</div><div class="value" id="statMyArt">0</div></div>
+        <div class="stat-card"><div class="label">AI-Assisted</div><div class="value" id="statAI">0</div></div>
+        <div class="stat-card"><div class="label">Favorites</div><div class="value" id="statFav">0</div></div>
+        <div class="stat-card"><div class="label">Avg Rating</div><div class="value" id="statAvg">—</div></div>
       </div>
-
       <h2 class="section-title">Featured Artwork</h2>
       <div class="artwork-grid" id="featuredGrid"></div>
-
-      <h2 class="section-title" style="margin-top: 2.5rem;">Recently Added</h2>
+      <h2 class="section-title">Recently Added</h2>
       <div class="artwork-grid" id="recentGrid"></div>
     </section>
 
-    <!-- MY ART VIEW -->
+    <!-- MY ART -->
     <section id="my-art" class="view">
       <div class="dashboard-header">
         <h1>My Art</h1>
         <p>Artwork created entirely by you.</p>
       </div>
       <div class="gallery-controls">
-        <div class="search-box">
-          <input type="text" id="searchMyArt" placeholder="Search title, tags, materials..." />
-        </div>
+        <div class="search-box"><input type="text" id="searchMyArt" placeholder="Search title, tags, materials..." /></div>
         <select class="filter-select" id="sortMyArt">
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
           <option value="highest">Highest rated</option>
           <option value="most-comments">Most comments</option>
+          <option value="most-viewed">Most viewed</option>
         </select>
         <select class="filter-select" id="filterRatingMyArt">
           <option value="all">All ratings</option>
@@ -923,25 +609,29 @@
           <option value="4">4+ stars</option>
           <option value="3">3+ stars</option>
         </select>
+        <button class="filter-chip" id="toggleAdvMyArt">Filters ▾</button>
+      </div>
+      <div class="advanced-filters" id="advMyArt">
+        <span style="font-size:0.85rem;color:var(--text-muted)">Tags:</span>
+        <div class="tag-filters" id="tagFiltersMyArt"></div>
       </div>
       <div class="artwork-grid" id="myArtGrid"></div>
     </section>
 
-    <!-- AI ART VIEW -->
+    <!-- AI ART -->
     <section id="ai-art" class="view">
       <div class="dashboard-header">
         <h1>AI Art Combined</h1>
         <p>Projects that blend AI-generated content with your original artwork.</p>
       </div>
       <div class="gallery-controls">
-        <div class="search-box">
-          <input type="text" id="searchAIArt" placeholder="Search title, AI tool, tags..." />
-        </div>
+        <div class="search-box"><input type="text" id="searchAIArt" placeholder="Search title, AI tool, tags..." /></div>
         <select class="filter-select" id="sortAIArt">
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
           <option value="highest">Highest rated</option>
           <option value="most-comments">Most comments</option>
+          <option value="most-viewed">Most viewed</option>
         </select>
         <select class="filter-select" id="filterRatingAIArt">
           <option value="all">All ratings</option>
@@ -949,8 +639,30 @@
           <option value="4">4+ stars</option>
           <option value="3">3+ stars</option>
         </select>
+        <select class="filter-select" id="filterAITool">
+          <option value="all">All AI tools</option>
+          <option value="Midjourney">Midjourney</option>
+          <option value="DALL·E">DALL·E</option>
+          <option value="Copilot">Copilot</option>
+          <option value="Stable Diffusion">Stable Diffusion</option>
+          <option value="Other">Other</option>
+        </select>
+        <button class="filter-chip" id="toggleAdvAIArt">Filters ▾</button>
+      </div>
+      <div class="advanced-filters" id="advAIArt">
+        <span style="font-size:0.85rem;color:var(--text-muted)">Tags:</span>
+        <div class="tag-filters" id="tagFiltersAIArt"></div>
       </div>
       <div class="artwork-grid" id="aiArtGrid"></div>
+    </section>
+
+    <!-- FAVORITES -->
+    <section id="favorites" class="view">
+      <div class="dashboard-header">
+        <h1>Favorites</h1>
+        <p>Your starred projects.</p>
+      </div>
+      <div class="artwork-grid" id="favGrid"></div>
     </section>
   </main>
 
@@ -958,21 +670,38 @@
   <div class="modal-overlay" id="detailModal">
     <div class="modal">
       <button class="modal-close" id="closeDetail">×</button>
-      <img class="modal-image" id="detailImage" src="" alt="" />
+      <div class="modal-gallery">
+        <img class="modal-main-img" id="detailImage" src="" alt="" />
+        <div class="thumb-strip" id="thumbStrip"></div>
+      </div>
       <div class="modal-body">
+        <div id="shareBanner" class="share-banner" style="display:none;">
+          <span>🔗 Shareable link ready</span>
+          <button id="copyShareLink">Copy Link</button>
+        </div>
         <h2 class="modal-title" id="detailTitle"></h2>
         <div class="modal-meta" id="detailMeta"></div>
+        <div class="modal-actions">
+          <button class="action-btn" id="favDetailBtn">♡ Favorite</button>
+          <button class="action-btn" id="shareBtn">🔗 Share</button>
+        </div>
         <div class="rating-section">
-          <span style="font-size:0.9rem;color:var(--text-muted)">Your rating:</span>
+          <span style="font-size:0.88rem;color:var(--text-muted)">Your rating:</span>
           <div id="detailStars"></div>
-          <span id="detailRatingText" style="font-size:0.9rem;color:var(--text-muted)"></span>
+          <span id="detailRatingText" style="font-size:0.88rem;color:var(--text-muted)"></span>
         </div>
         <div class="art-card-tags" id="detailTags"></div>
+
+        <div id="modPanel" class="mod-panel" style="display:none;">
+          <h4>🛡 Comment Moderation</h4>
+          <div id="modList"></div>
+        </div>
+
         <div class="comments-section">
           <h3>Comments</h3>
           <div class="comment-list" id="commentList"></div>
           <div class="comment-form">
-            <input type="text" id="commentInput" placeholder="Share your thoughts..." maxlength="300" />
+            <input type="text" id="commentInput" placeholder="Share your thoughts..." maxlength="400" />
             <button id="submitComment">Post</button>
           </div>
         </div>
@@ -988,16 +717,15 @@
         <h2>Add New Project</h2>
         <div class="drop-zone" id="dropZone">
           <div class="icon">🖼️</div>
-          <p><strong>Drag & drop</strong> images here or click to browse</p>
+          <p><strong>Drag & drop</strong> images here or click to browse<br><small>Multiple images supported</small></p>
           <input type="file" id="fileInput" accept="image/*" multiple hidden />
         </div>
         <div class="preview-images" id="previewImages"></div>
 
         <div class="form-group">
           <label>Project Title *</label>
-          <input type="text" id="projectTitle" placeholder="e.g. Sunset Over the Lake" required />
+          <input type="text" id="projectTitle" placeholder="e.g. Sunset Over the Lake" />
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label>Category *</label>
@@ -1017,22 +745,18 @@
             </select>
           </div>
         </div>
-
         <div class="form-group" id="aiPercentGroup" style="display:none;">
           <label>AI Contribution (%)</label>
           <input type="number" id="aiPercent" min="1" max="99" value="40" />
         </div>
-
         <div class="form-group">
           <label>Tags (comma separated)</label>
           <input type="text" id="projectTags" placeholder="landscape, oil, nature, warm tones" />
         </div>
-
         <div class="form-group">
           <label>Materials / Tools Used</label>
           <input type="text" id="projectMaterials" placeholder="Oil on canvas, 16×20 in" />
         </div>
-
         <div class="form-actions">
           <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
           <button class="btn btn-primary" id="saveProject">Save Project</button>
@@ -1041,162 +765,142 @@
     </div>
   </div>
 
-  <!-- TOAST -->
   <div class="toast" id="toast"></div>
-
-  <!-- BACK TO TOP -->
   <button class="back-to-top" id="backToTop" title="Back to top">↑</button>
 
   <script>
-    // ========== DATA & STATE ==========
-    const STORAGE_KEY = 'myArtProjects_v1';
+    const STORAGE_KEY = 'myArtProjects_v2';
+    const FAV_KEY = 'myArtFavorites_v2';
     let projects = [];
+    let favorites = new Set();
     let currentProjectId = null;
-    let uploadedFiles = []; // temporary base64 previews
+    let uploadedFiles = [];
+    let activeTagFilters = { 'my-art': new Set(), 'ai-art': new Set() };
+    let currentImageIndex = 0;
 
-    // Simple bad-word filter (basic moderation)
-    const BAD_WORDS = ['spam', 'idiot', 'hate', 'stupid', 'dumb', 'sucks', 'kill', 'die'];
+    // Expanded moderation list
+    const BAD_WORDS = [
+      'spam','idiot','hate','stupid','dumb','sucks','kill','die','trash','garbage',
+      'scam','fraud','ugly','worst','pathetic','loser','shut up','fuck','shit','asshole',
+      'bitch','damn','crap','bastard','moron','jerk'
+    ];
 
-    // ========== INITIALIZATION ==========
     function init() {
-      loadProjects();
-      if (projects.length === 0) {
-        seedSampleData();
-      }
+      loadData();
+      if (projects.length === 0) seedSampleData();
       setupEventListeners();
       applyTheme();
       renderAll();
+      checkShareLink();
     }
 
-    function loadProjects() {
+    function loadData() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        projects = raw ? JSON.parse(raw) : [];
+        projects = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        favorites = new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]'));
       } catch (e) {
         projects = [];
+        favorites = new Set();
       }
     }
 
-    function saveProjects() {
+    function saveData() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+      localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
     }
 
     function seedSampleData() {
       const now = Date.now();
       projects = [
         {
-          id: 'p1',
-          title: 'Golden Hour Valley',
-          category: 'my-art',
-          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-          tags: ['landscape', 'oil', 'nature'],
-          materials: 'Oil on canvas, 24×36 in',
-          rating: 5,
-          comments: [
-            { id: 'c1', text: 'Absolutely stunning light!', author: 'Viewer', time: now - 86400000, hidden: false }
+          id: 'p1', title: 'Golden Hour Valley', category: 'my-art',
+          images: [
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+            'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80'
           ],
-          createdAt: now - 5 * 86400000,
-          views: 42
+          tags: ['landscape', 'oil', 'nature'], materials: 'Oil on canvas, 24×36 in',
+          rating: 5, comments: [
+            { id: 'c1', text: 'Absolutely stunning light!', author: 'Viewer', time: now - 86400000, hidden: false, reported: false }
+          ], createdAt: now - 5 * 86400000, views: 42
         },
         {
-          id: 'p2',
-          title: 'Abstract Flow',
-          category: 'my-art',
-          image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
-          tags: ['abstract', 'acrylic', 'color'],
-          materials: 'Acrylic on panel',
-          rating: 4,
-          comments: [],
-          createdAt: now - 3 * 86400000,
-          views: 28
+          id: 'p2', title: 'Abstract Flow', category: 'my-art',
+          images: ['https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80'],
+          tags: ['abstract', 'acrylic', 'color'], materials: 'Acrylic on panel',
+          rating: 4, comments: [], createdAt: now - 3 * 86400000, views: 28
         },
         {
-          id: 'p3',
-          title: 'Dream Forest (AI Assisted)',
-          category: 'ai-art',
-          image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
-          tags: ['fantasy', 'forest', 'digital'],
-          materials: 'Digital + traditional sketch',
-          aiTool: 'Midjourney',
-          aiPercent: 55,
-          rating: 5,
-          comments: [
-            { id: 'c2', text: 'Beautiful blend of styles!', author: 'Viewer', time: now - 43200000, hidden: false }
+          id: 'p3', title: 'Dream Forest (AI Assisted)', category: 'ai-art',
+          images: [
+            'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+            'https://images.unsplash.com/photo-1511497584788-876760111969?w=800&q=80'
           ],
-          createdAt: now - 2 * 86400000,
-          views: 67
+          tags: ['fantasy', 'forest', 'digital'], materials: 'Digital + traditional sketch',
+          aiTool: 'Midjourney', aiPercent: 55, rating: 5,
+          comments: [
+            { id: 'c2', text: 'Beautiful blend of styles!', author: 'Viewer', time: now - 43200000, hidden: false, reported: false }
+          ], createdAt: now - 2 * 86400000, views: 67
         },
         {
-          id: 'p4',
-          title: 'Portrait Study',
-          category: 'my-art',
-          image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=80',
-          tags: ['portrait', 'charcoal'],
-          materials: 'Charcoal on paper',
-          rating: 4,
-          comments: [],
-          createdAt: now - 1 * 86400000,
-          views: 19
+          id: 'p4', title: 'Portrait Study', category: 'my-art',
+          images: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=80'],
+          tags: ['portrait', 'charcoal'], materials: 'Charcoal on paper',
+          rating: 4, comments: [], createdAt: now - 1 * 86400000, views: 19
         },
         {
-          id: 'p5',
-          title: 'Neon City Dreams',
-          category: 'ai-art',
-          image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80',
-          tags: ['cityscape', 'cyberpunk', 'digital'],
-          materials: 'Digital painting',
-          aiTool: 'DALL·E',
-          aiPercent: 70,
-          rating: 3,
-          comments: [],
-          createdAt: now - 0.5 * 86400000,
-          views: 31
+          id: 'p5', title: 'Neon City Dreams', category: 'ai-art',
+          images: ['https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80'],
+          tags: ['cityscape', 'cyberpunk', 'digital'], materials: 'Digital painting',
+          aiTool: 'DALL·E', aiPercent: 70, rating: 3, comments: [],
+          createdAt: now - 0.5 * 86400000, views: 31
         }
       ];
-      saveProjects();
+      // Migrate old single image format if needed
+      projects.forEach(p => {
+        if (!p.images && p.image) p.images = [p.image];
+      });
+      saveData();
     }
 
-    // ========== RENDERING ==========
+    // ========== RENDER ==========
     function renderAll() {
       renderDashboard();
       renderGallery('my-art');
       renderGallery('ai-art');
+      renderFavorites();
+      buildTagFilters();
     }
 
     function renderDashboard() {
       const myArt = projects.filter(p => p.category === 'my-art');
       const aiArt = projects.filter(p => p.category === 'ai-art');
       const rated = projects.filter(p => p.rating > 0);
-      const avg = rated.length
-        ? (rated.reduce((s, p) => s + p.rating, 0) / rated.length).toFixed(1)
-        : '—';
+      const avg = rated.length ? (rated.reduce((s, p) => s + p.rating, 0) / rated.length).toFixed(1) : '—';
 
       document.getElementById('statTotal').textContent = projects.length;
       document.getElementById('statMyArt').textContent = myArt.length;
       document.getElementById('statAI').textContent = aiArt.length;
+      document.getElementById('statFav').textContent = favorites.size;
       document.getElementById('statAvg').textContent = avg;
 
-      // Featured = highest rated + most viewed
       const featured = [...projects]
-        .sort((a, b) => (b.rating * 10 + b.views) - (a.rating * 10 + a.views))
+        .sort((a, b) => (b.rating * 10 + (b.views || 0)) - (a.rating * 10 + (a.views || 0)))
         .slice(0, 3);
-      document.getElementById('featuredGrid').innerHTML = featured.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
+      document.getElementById('featuredGrid').innerHTML =
+        featured.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
 
-      // Recent
       const recent = [...projects].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
-      document.getElementById('recentGrid').innerHTML = recent.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
+      document.getElementById('recentGrid').innerHTML =
+        recent.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
     }
 
-    function renderGallery(category) {
-      const isMyArt = category === 'my-art';
-      const gridId = isMyArt ? 'myArtGrid' : 'aiArtGrid';
-      const searchId = isMyArt ? 'searchMyArt' : 'searchAIArt';
-      const sortId = isMyArt ? 'sortMyArt' : 'sortAIArt';
-      const ratingId = isMyArt ? 'filterRatingMyArt' : 'filterRatingAIArt';
-
+    function getFilteredList(category) {
       let list = projects.filter(p => p.category === category);
+      const isMy = category === 'my-art';
+      const searchId = isMy ? 'searchMyArt' : 'searchAIArt';
+      const sortId = isMy ? 'sortMyArt' : 'sortAIArt';
+      const ratingId = isMy ? 'filterRatingMyArt' : 'filterRatingAIArt';
 
-      // Search
       const q = document.getElementById(searchId).value.toLowerCase().trim();
       if (q) {
         list = list.filter(p =>
@@ -1207,47 +911,74 @@
         );
       }
 
-      // Rating filter
       const minRating = document.getElementById(ratingId).value;
-      if (minRating !== 'all') {
-        list = list.filter(p => p.rating >= parseInt(minRating));
+      if (minRating !== 'all') list = list.filter(p => p.rating >= parseInt(minRating));
+
+      if (!isMy) {
+        const tool = document.getElementById('filterAITool').value;
+        if (tool !== 'all') list = list.filter(p => p.aiTool === tool);
       }
 
-      // Sort
+      // Tag filters
+      const activeTags = activeTagFilters[category];
+      if (activeTags.size > 0) {
+        list = list.filter(p => [...activeTags].every(t => (p.tags || []).includes(t)));
+      }
+
       const sort = document.getElementById(sortId).value;
       list.sort((a, b) => {
         if (sort === 'newest') return b.createdAt - a.createdAt;
         if (sort === 'oldest') return a.createdAt - b.createdAt;
         if (sort === 'highest') return b.rating - a.rating;
         if (sort === 'most-comments') return (b.comments?.length || 0) - (a.comments?.length || 0);
+        if (sort === 'most-viewed') return (b.views || 0) - (a.views || 0);
         return 0;
       });
+      return list;
+    }
 
+    function renderGallery(category) {
+      const isMy = category === 'my-art';
+      const gridId = isMy ? 'myArtGrid' : 'aiArtGrid';
+      const list = getFilteredList(category);
       const grid = document.getElementById(gridId);
-      if (list.length === 0) {
-        grid.innerHTML = emptyHTML(isMyArt ? 'No original artwork yet. Add your first piece!' : 'No AI-assisted projects yet.');
-      } else {
-        grid.innerHTML = list.map(p => createCard(p)).join('');
-      }
+      grid.innerHTML = list.length
+        ? list.map(p => createCard(p)).join('')
+        : emptyHTML(isMy ? 'No original artwork yet.' : 'No AI-assisted projects yet.');
+    }
+
+    function renderFavorites() {
+      const list = projects.filter(p => favorites.has(p.id));
+      document.getElementById('favGrid').innerHTML = list.length
+        ? list.map(p => createCard(p)).join('')
+        : emptyHTML('No favorites yet. Click the heart on any project!');
     }
 
     function createCard(p) {
+      const imgs = p.images || (p.image ? [p.image] : []);
+      const primary = imgs[0] || '';
       const stars = '★'.repeat(p.rating) + '☆'.repeat(5 - p.rating);
       const badge = p.category === 'ai-art'
         ? `<span class="art-card-badge ai">${p.aiTool || 'AI'} · ${p.aiPercent || '?'}%</span>`
         : `<span class="art-card-badge">Original</span>`;
-      const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
-      const comments = p.comments?.filter(c => !c.hidden).length || 0;
+      const multi = imgs.length > 1 ? `<span class="multi-badge">${imgs.length} images</span>` : '';
+      const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+      const comments = (p.comments || []).filter(c => !c.hidden).length;
+      const isFav = favorites.has(p.id);
 
       return `
         <article class="art-card" data-id="${p.id}">
-          <div class="art-card-image watermarked">
-            <img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy" />
+          <div class="art-card-image">
+            <img src="${primary}" alt="${escapeHtml(p.title)}" loading="lazy" />
             ${badge}
+            ${multi}
+            <button class="fav-btn ${isFav ? 'favorited' : ''}" data-fav="${p.id}" title="Favorite">
+              ${isFav ? '♥' : '♡'}
+            </button>
           </div>
           <div class="art-card-body">
             <h3 class="art-card-title">${escapeHtml(p.title)}</h3>
-            <div class="art-card-meta">${p.materials || '—'}</div>
+            <div class="art-card-meta">${escapeHtml(p.materials || '—')}</div>
             <div class="art-card-tags">${tags}</div>
             <div class="art-card-footer">
               <span class="stars">${stars}</span>
@@ -1259,32 +990,50 @@
     }
 
     function emptyHTML(msg) {
-      return `
-        <div class="empty-state" style="grid-column:1/-1">
-          <div class="icon">🎨</div>
-          <h3>Nothing here yet</h3>
-          <p>${msg}</p>
-        </div>
-      `;
+      return `<div class="empty-state"><div class="icon">🎨</div><h3>Nothing here yet</h3><p>${msg}</p></div>`;
     }
 
-    // ========== DETAIL MODAL ==========
+    function buildTagFilters() {
+      ['my-art', 'ai-art'].forEach(cat => {
+        const allTags = new Set();
+        projects.filter(p => p.category === cat).forEach(p => (p.tags || []).forEach(t => allTags.add(t)));
+        const container = document.getElementById(cat === 'my-art' ? 'tagFiltersMyArt' : 'tagFiltersAIArt');
+        container.innerHTML = [...allTags].sort().map(t => {
+          const active = activeTagFilters[cat].has(t) ? 'active' : '';
+          return `<button class="filter-chip ${active}" data-tag="${escapeHtml(t)}" data-cat="${cat}">${escapeHtml(t)}</button>`;
+        }).join('');
+      });
+    }
+
+    // ========== DETAIL ==========
     function openDetail(id) {
       const p = projects.find(x => x.id === id);
       if (!p) return;
       currentProjectId = id;
+      currentImageIndex = 0;
       p.views = (p.views || 0) + 1;
-      saveProjects();
+      saveData();
 
-      document.getElementById('detailImage').src = p.image;
+      const imgs = p.images || (p.image ? [p.image] : []);
+      document.getElementById('detailImage').src = imgs[0] || '';
       document.getElementById('detailTitle').textContent = p.title;
 
       let meta = p.materials || '';
-      if (p.category === 'ai-art') {
-        meta += ` · AI: ${p.aiTool || 'Unknown'} (${p.aiPercent || '?'}%)`;
-      }
-      meta += ` · Added ${formatDate(p.createdAt)}`;
+      if (p.category === 'ai-art') meta += ` · AI: ${p.aiTool || 'Unknown'} (${p.aiPercent || '?'}%)`;
+      meta += ` · Added ${formatDate(p.createdAt)} · ${p.views} views`;
       document.getElementById('detailMeta').textContent = meta;
+
+      // Thumbs
+      const strip = document.getElementById('thumbStrip');
+      if (imgs.length > 1) {
+        strip.style.display = 'flex';
+        strip.innerHTML = imgs.map((src, i) =>
+          `<img src="${src}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="thumb" />`
+        ).join('');
+      } else {
+        strip.style.display = 'none';
+        strip.innerHTML = '';
+      }
 
       // Stars
       const starsEl = document.getElementById('detailStars');
@@ -1299,11 +1048,18 @@
       }
       document.getElementById('detailRatingText').textContent = p.rating ? `${p.rating}/5` : 'Not rated';
 
-      // Tags
-      document.getElementById('detailTags').innerHTML = (p.tags || [])
-        .map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+      document.getElementById('detailTags').innerHTML =
+        (p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+
+      // Fav button
+      const favBtn = document.getElementById('favDetailBtn');
+      const isFav = favorites.has(id);
+      favBtn.textContent = isFav ? '♥ Favorited' : '♡ Favorite';
+      favBtn.classList.toggle('favorited', isFav);
 
       renderComments(p);
+      renderModPanel(p);
+      document.getElementById('shareBanner').style.display = 'none';
       document.getElementById('detailModal').classList.add('open');
     }
 
@@ -1311,26 +1067,69 @@
       const p = projects.find(x => x.id === id);
       if (!p) return;
       p.rating = value;
-      saveProjects();
-      openDetail(id); // refresh
+      saveData();
+      openDetail(id);
       renderAll();
       showToast('Rating saved!');
+    }
+
+    function toggleFavorite(id) {
+      if (favorites.has(id)) {
+        favorites.delete(id);
+        showToast('Removed from favorites');
+      } else {
+        favorites.add(id);
+        showToast('Added to favorites');
+      }
+      saveData();
+      renderAll();
+      if (currentProjectId === id) {
+        const favBtn = document.getElementById('favDetailBtn');
+        const isFav = favorites.has(id);
+        favBtn.textContent = isFav ? '♥ Favorited' : '♡ Favorite';
+        favBtn.classList.toggle('favorited', isFav);
+      }
     }
 
     function renderComments(p) {
       const list = document.getElementById('commentList');
       const visible = (p.comments || []).filter(c => !c.hidden);
-      if (visible.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;">No comments yet. Be the first!</p>';
+      if (!visible.length) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;">No comments yet. Be the first!</p>';
         return;
       }
       list.innerHTML = visible.map(c => `
-        <div class="comment">
+        <div class="comment ${c.reported ? 'reported' : ''}">
           <div class="comment-header">
             <span>${escapeHtml(c.author || 'Anonymous')}</span>
             <span>${formatDate(c.time)}</span>
           </div>
           <div>${escapeHtml(c.text)}</div>
+          <div class="comment-actions">
+            <button data-report="${c.id}">⚑ Report</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderModPanel(p) {
+      const panel = document.getElementById('modPanel');
+      const hiddenOrReported = (p.comments || []).filter(c => c.hidden || c.reported);
+      if (!hiddenOrReported.length) {
+        panel.style.display = 'none';
+        return;
+      }
+      panel.style.display = 'block';
+      document.getElementById('modList').innerHTML = hiddenOrReported.map(c => `
+        <div style="margin-bottom:0.6rem;padding:0.5rem;background:var(--bg-card);border-radius:8px;">
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.2rem;">
+            ${c.hidden ? '🚫 Hidden' : ''} ${c.reported ? '⚑ Reported' : ''} · ${escapeHtml(c.author)} · ${formatDate(c.time)}
+          </div>
+          <div style="margin-bottom:0.4rem;">${escapeHtml(c.text)}</div>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="action-btn" data-approve="${c.id}" style="font-size:0.78rem;padding:0.3rem 0.7rem;">Approve</button>
+            <button class="action-btn" data-delete-c="${c.id}" style="font-size:0.78rem;padding:0.3rem 0.7rem;">Delete</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1346,26 +1145,96 @@
       const lower = text.toLowerCase();
       const isBad = BAD_WORDS.some(w => lower.includes(w));
 
+      // Simple repeat-offender check (same text)
+      const isRepeat = (p.comments || []).some(c => c.text.toLowerCase() === lower);
+
       const comment = {
         id: 'c' + Date.now(),
         text,
         author: 'You',
         time: Date.now(),
-        hidden: isBad
+        hidden: isBad || isRepeat,
+        reported: false
       };
 
       if (!p.comments) p.comments = [];
       p.comments.push(comment);
-      saveProjects();
-
+      saveData();
       input.value = '';
       renderComments(p);
+      renderModPanel(p);
       renderAll();
 
-      if (isBad) {
-        showToast('Comment hidden due to inappropriate language.');
-      } else {
-        showToast('Comment posted!');
+      if (isBad) showToast('Comment hidden due to prohibited language.');
+      else if (isRepeat) showToast('Duplicate comment hidden.');
+      else showToast('Comment posted!');
+    }
+
+    function reportComment(commentId) {
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      const c = (p.comments || []).find(x => x.id === commentId);
+      if (!c) return;
+      c.reported = true;
+      saveData();
+      renderComments(p);
+      renderModPanel(p);
+      showToast('Comment reported. You can review it in the moderation panel.');
+    }
+
+    function approveComment(commentId) {
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      const c = (p.comments || []).find(x => x.id === commentId);
+      if (!c) return;
+      c.hidden = false;
+      c.reported = false;
+      saveData();
+      renderComments(p);
+      renderModPanel(p);
+      renderAll();
+      showToast('Comment approved.');
+    }
+
+    function deleteComment(commentId) {
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      p.comments = (p.comments || []).filter(x => x.id !== commentId);
+      saveData();
+      renderComments(p);
+      renderModPanel(p);
+      renderAll();
+      showToast('Comment deleted.');
+    }
+
+    // ========== SHARE ==========
+    function generateShareLink(id) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('project', id);
+      return url.toString();
+    }
+
+    function shareProject() {
+      if (!currentProjectId) return;
+      const link = generateShareLink(currentProjectId);
+      document.getElementById('shareBanner').style.display = 'flex';
+      document.getElementById('copyShareLink').onclick = () => {
+        navigator.clipboard.writeText(link).then(() => showToast('Link copied!'));
+      };
+      // Also try native share if available
+      if (navigator.share) {
+        navigator.share({
+          title: document.getElementById('detailTitle').textContent,
+          url: link
+        }).catch(() => {});
+      }
+    }
+
+    function checkShareLink() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('project');
+      if (id && projects.find(p => p.id === id)) {
+        setTimeout(() => openDetail(id), 300);
       }
     }
 
@@ -1388,36 +1257,36 @@
         const reader = new FileReader();
         reader.onload = (e) => {
           uploadedFiles.push(e.target.result);
-          const img = document.createElement('img');
-          img.src = e.target.result;
-          document.getElementById('previewImages').appendChild(img);
+          renderPreviews();
         };
         reader.readAsDataURL(file);
       });
     }
 
+    function renderPreviews() {
+      const container = document.getElementById('previewImages');
+      container.innerHTML = uploadedFiles.map((src, i) => `
+        <div class="preview-item">
+          <img src="${src}" alt="preview" />
+          <button class="remove-img" data-idx="${i}">×</button>
+        </div>
+      `).join('');
+    }
+
     function saveProject() {
       const title = document.getElementById('projectTitle').value.trim();
-      if (!title) {
-        showToast('Please enter a title.');
-        return;
-      }
-      if (uploadedFiles.length === 0) {
-        showToast('Please add at least one image.');
-        return;
-      }
+      if (!title) { showToast('Please enter a title.'); return; }
+      if (uploadedFiles.length === 0) { showToast('Please add at least one image.'); return; }
 
       const category = document.getElementById('projectCategory').value;
       const tags = document.getElementById('projectTags').value
-        .split(',')
-        .map(t => t.trim())
-        .filter(Boolean);
+        .split(',').map(t => t.trim()).filter(Boolean);
 
       const project = {
         id: 'p' + Date.now(),
         title,
         category,
-        image: uploadedFiles[0], // primary image
+        images: [...uploadedFiles],
         tags,
         materials: document.getElementById('projectMaterials').value.trim(),
         rating: 0,
@@ -1432,13 +1301,28 @@
       }
 
       projects.unshift(project);
-      saveProjects();
+      saveData();
       document.getElementById('uploadModal').classList.remove('open');
       renderAll();
-      showToast('Project added successfully!');
-
-      // Switch to correct gallery
+      showToast('Project added!');
       switchView(category === 'my-art' ? 'my-art' : 'ai-art');
+    }
+
+    // ========== EXPORT ==========
+    function exportJSON() {
+      const data = {
+        exportedAt: new Date().toISOString(),
+        projects,
+        favorites: [...favorites]
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MyArtProjects-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup downloaded!');
     }
 
     // ========== HELPERS ==========
@@ -1446,7 +1330,8 @@
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(viewId).classList.add('active');
-      document.querySelector(`.nav-btn[data-view="${viewId}"]`).classList.add('active');
+      const btn = document.querySelector(`.nav-btn[data-view="${viewId}"]`);
+      if (btn) btn.classList.add('active');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1458,16 +1343,13 @@
     }
 
     function formatDate(ts) {
-      const d = new Date(ts);
-      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+      return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function escapeHtml(str) {
       return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
     function applyTheme() {
@@ -1477,33 +1359,25 @@
     }
 
     function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      const next = current === 'dark' ? 'light' : 'dark';
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('myArtTheme', next);
       document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
     }
 
-    // ========== EVENT LISTENERS ==========
+    // ========== EVENTS ==========
     function setupEventListeners() {
-      // Navigation
       document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.addEventListener('click', () => switchView(btn.dataset.view));
       });
 
-      // Theme
       document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-
-      // Upload open/close
+      document.getElementById('exportBtn').addEventListener('click', exportJSON);
       document.getElementById('openUpload').addEventListener('click', openUpload);
-      document.getElementById('closeUpload').addEventListener('click', () => {
-        document.getElementById('uploadModal').classList.remove('open');
-      });
-      document.getElementById('cancelUpload').addEventListener('click', () => {
-        document.getElementById('uploadModal').classList.remove('open');
-      });
+      document.getElementById('closeUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
+      document.getElementById('cancelUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
+      document.getElementById('closeDetail').addEventListener('click', () => document.getElementById('detailModal').classList.remove('open'));
 
-      // Category change
       document.getElementById('projectCategory').addEventListener('change', (e) => {
         const isAI = e.target.value === 'ai-art';
         document.getElementById('aiToolGroup').style.display = isAI ? 'block' : 'none';
@@ -1514,44 +1388,97 @@
       const dropZone = document.getElementById('dropZone');
       const fileInput = document.getElementById('fileInput');
       dropZone.addEventListener('click', () => fileInput.click());
-      dropZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        dropZone.classList.add('dragover');
-      });
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
       dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-      dropZone.addEventListener('drop', (e) => {
+      dropZone.addEventListener('drop', e => {
         e.preventDefault();
         dropZone.classList.remove('dragover');
         handleFiles(e.dataTransfer.files);
       });
       fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
-      // Save project
-      document.getElementById('saveProject').addEventListener('click', saveProject);
-
-      // Detail modal
-      document.getElementById('closeDetail').addEventListener('click', () => {
-        document.getElementById('detailModal').classList.remove('open');
+      document.getElementById('previewImages').addEventListener('click', e => {
+        if (e.target.classList.contains('remove-img')) {
+          uploadedFiles.splice(parseInt(e.target.dataset.idx), 1);
+          renderPreviews();
+        }
       });
+
+      document.getElementById('saveProject').addEventListener('click', saveProject);
       document.getElementById('submitComment').addEventListener('click', submitComment);
-      document.getElementById('commentInput').addEventListener('keydown', (e) => {
+      document.getElementById('commentInput').addEventListener('keydown', e => {
         if (e.key === 'Enter') submitComment();
       });
 
-      // Card clicks (event delegation)
-      document.addEventListener('click', (e) => {
-        const card = e.target.closest('.art-card');
-        if (card) openDetail(card.dataset.id);
+      document.getElementById('favDetailBtn').addEventListener('click', () => {
+        if (currentProjectId) toggleFavorite(currentProjectId);
+      });
+      document.getElementById('shareBtn').addEventListener('click', shareProject);
+
+      // Thumbnails with smooth fade
+      document.getElementById('thumbStrip').addEventListener('click', e => {
+        if (e.target.tagName === 'IMG') {
+          const idx = parseInt(e.target.dataset.idx);
+          if (idx === currentImageIndex) return;
+          currentImageIndex = idx;
+          const p = projects.find(x => x.id === currentProjectId);
+          const imgs = p.images || [];
+          const mainImg = document.getElementById('detailImage');
+          mainImg.classList.add('fading');
+          setTimeout(() => {
+            mainImg.src = imgs[idx];
+            mainImg.classList.remove('fading');
+          }, 180);
+          document.querySelectorAll('#thumbStrip img').forEach((img, i) => {
+            img.classList.toggle('active', i === idx);
+          });
+        }
       });
 
-      // Search & filters
-      ['searchMyArt', 'sortMyArt', 'filterRatingMyArt'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => renderGallery('my-art'));
-        document.getElementById(id).addEventListener('change', () => renderGallery('my-art'));
+      // Card clicks + fav buttons
+      document.addEventListener('click', e => {
+        const favBtn = e.target.closest('.fav-btn');
+        if (favBtn) {
+          e.stopPropagation();
+          toggleFavorite(favBtn.dataset.fav);
+          return;
+        }
+        const card = e.target.closest('.art-card');
+        if (card) openDetail(card.dataset.id);
+
+        // Comment actions
+        if (e.target.dataset.report) reportComment(e.target.dataset.report);
+        if (e.target.dataset.approve) approveComment(e.target.dataset.approve);
+        if (e.target.dataset.deleteC) deleteComment(e.target.dataset.deleteC);
+
+        // Tag filters
+        if (e.target.dataset.tag) {
+          const tag = e.target.dataset.tag;
+          const cat = e.target.dataset.cat;
+          if (activeTagFilters[cat].has(tag)) activeTagFilters[cat].delete(tag);
+          else activeTagFilters[cat].add(tag);
+          e.target.classList.toggle('active');
+          renderGallery(cat);
+        }
       });
-      ['searchAIArt', 'sortAIArt', 'filterRatingAIArt'].forEach(id => {
-        document.getElementById(id).addEventListener('input', () => renderGallery('ai-art'));
-        document.getElementById(id).addEventListener('change', () => renderGallery('ai-art'));
+
+      // Filters
+      ['searchMyArt', 'sortMyArt', 'filterRatingMyArt'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => renderGallery('my-art'));
+        el.addEventListener('change', () => renderGallery('my-art'));
+      });
+      ['searchAIArt', 'sortAIArt', 'filterRatingAIArt', 'filterAITool'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => renderGallery('ai-art'));
+        el.addEventListener('change', () => renderGallery('ai-art'));
+      });
+
+      document.getElementById('toggleAdvMyArt').addEventListener('click', () => {
+        document.getElementById('advMyArt').classList.toggle('open');
+      });
+      document.getElementById('toggleAdvAIArt').addEventListener('click', () => {
+        document.getElementById('advAIArt').classList.toggle('open');
       });
 
       // Back to top
@@ -1561,15 +1488,13 @@
       });
       backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
-      // Close modals on overlay click
       document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
+        overlay.addEventListener('click', e => {
           if (e.target === overlay) overlay.classList.remove('open');
         });
       });
     }
 
-    // Start
     init();
   </script>
 </body>
