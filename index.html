@@ -597,6 +597,45 @@
     .readonly-banner strong { color: var(--text); }
     body:not(.is-creator) .creator-only { display: none !important; }
 
+
+    /* Archive / Hidden */
+    .art-card.hidden-project {
+      opacity: 0.55;
+      border-style: dashed;
+    }
+    .hidden-badge {
+      position: absolute; bottom: 0.7rem; left: 0.7rem;
+      background: rgba(0,0,0,0.7); color: #f0d78c; font-size: 0.7rem;
+      padding: 0.2rem 0.5rem; border-radius: 6px; font-weight: 500;
+    }
+    .archive-toggle {
+      font-size: 0.85rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .archive-toggle label { cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+    .img-manage-list {
+      display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 0.8rem 0 1rem;
+    }
+    .img-manage-item {
+      position: relative; width: 80px; height: 80px;
+    }
+    .img-manage-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 8px; border: 1px solid var(--border);
+    }
+    .img-manage-item.hidden-img img { opacity: 0.4; }
+    .img-manage-item .img-action {
+      position: absolute; top: -6px; right: -6px;
+      width: 22px; height: 22px; border-radius: 50%;
+      border: none; font-size: 0.7rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      background: #e74c3c; color: white;
+    }
+    .img-manage-item.hidden-img .img-action {
+      background: var(--accent-2);
+    }
+
   </style>
 </head>
 <body>
@@ -661,6 +700,9 @@
           <option value="3">3+ stars</option>
         </select>
         <button class="filter-chip" id="toggleAdvMyArt">Filters ▾</button>
+        <label class="filter-chip creator-only" style="cursor:pointer;">
+          <input type="checkbox" id="showHiddenMyArt" style="margin-right:0.3rem;" /> Show hidden
+        </label>
       </div>
       <div class="advanced-filters" id="advMyArt">
         <span style="font-size:0.85rem;color:var(--text-muted)">Tags:</span>
@@ -699,6 +741,9 @@
           <option value="Other">Other</option>
         </select>
         <button class="filter-chip" id="toggleAdvAIArt">Filters ▾</button>
+        <label class="filter-chip creator-only" style="cursor:pointer;">
+          <input type="checkbox" id="showHiddenAIArt" style="margin-right:0.3rem;" /> Show hidden
+        </label>
       </div>
       <div class="advanced-filters" id="advAIArt">
         <span style="font-size:0.85rem;color:var(--text-muted)">Tags:</span>
@@ -735,6 +780,14 @@
         <div class="modal-actions">
           <button class="action-btn" id="favDetailBtn">♡ Favorite</button>
           <button class="action-btn" id="shareBtn">🔗 Share</button>
+          <button class="action-btn creator-only" id="hideProjectBtn">👁 Hide from gallery</button>
+          <button class="action-btn creator-only" id="manageImagesBtn">🖼 Manage images</button>
+        </div>
+        <div id="imageManagePanel" class="creator-only" style="display:none;">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">
+            Hide individual images from public view. Hidden images stay in your data and can be restored.
+          </p>
+          <div class="img-manage-list" id="imgManageList"></div>
         </div>
         <div class="rating-section">
           <span style="font-size:0.88rem;color:var(--text-muted)">Your rating:</span>
@@ -819,25 +872,107 @@
 
   <!-- AUTH MODAL -->
   <div class="modal-overlay" id="authModal">
-    <div class="modal" style="max-width:420px;">
+    <div class="modal" style="max-width:440px;">
       <button class="modal-close" id="closeAuth">×</button>
       <div class="auth-modal-box">
         <h2 id="authModalTitle">Creator Sign In</h2>
         <p id="authModalDesc">Enter your creator password to add projects, moderate comments, and manage your portfolio.</p>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="authPassword" placeholder="Enter password" autocomplete="current-password" />
+
+        <!-- Sign In fields -->
+        <div id="signInFields">
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="authPassword" placeholder="Enter password" autocomplete="current-password" />
+          </div>
+          <div class="form-actions" style="justify-content:stretch;flex-direction:column;gap:0.6rem;">
+            <button class="btn btn-primary" id="authSubmit" style="width:100%;">Sign In</button>
+            <button class="btn btn-secondary" id="forgotPassBtn" style="width:100%;">Forgot password?</button>
+          </div>
+          <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);text-align:center;">
+            Default password: <code>creator</code>
+          </p>
         </div>
-        <div class="form-group" id="setPasswordGroup" style="display:none;">
-          <label>New Password</label>
-          <input type="password" id="newPassword" placeholder="Choose a new password" />
+
+        <!-- Forgot / Recover fields -->
+        <div id="recoverFields" style="display:none;">
+          <div class="form-group">
+            <label>Security Question</label>
+            <div id="recoverQuestionDisplay" style="padding:0.7rem 1rem;background:var(--bg-soft);border-radius:var(--radius-sm);font-size:0.95rem;margin-bottom:0.5rem;">—</div>
+          </div>
+          <div class="form-group">
+            <label>Your Answer</label>
+            <input type="text" id="recoverAnswer" placeholder="Answer to security question" />
+          </div>
+          <div class="form-group">
+            <label>Or enter Recovery Code</label>
+            <input type="text" id="recoverCode" placeholder="e.g. AB12-CD34-EF56" style="text-transform:uppercase;" />
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="recoverNewPass" placeholder="New password (min 4 characters)" />
+          </div>
+          <div class="form-actions" style="gap:0.6rem;">
+            <button class="btn btn-secondary" id="backToSignIn" style="flex:1;">Back</button>
+            <button class="btn btn-primary" id="resetPassBtn" style="flex:1;">Reset Password</button>
+          </div>
         </div>
-        <div class="form-actions" style="justify-content:stretch;">
-          <button class="btn btn-primary" id="authSubmit" style="flex:1;">Sign In</button>
+
+        <!-- Change Password + Recovery Setup (when signed in) -->
+        <div id="changePassFields" style="display:none;">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="currentPassword" placeholder="Current password" />
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" placeholder="New password (min 4 characters)" />
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm new password" />
+          </div>
+
+          <hr style="border:none;border-top:1px solid var(--border);margin:1.2rem 0;" />
+
+          <h3 style="font-family:var(--font-display);font-size:1.15rem;margin-bottom:0.6rem;">Recovery Setup</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.9rem;">Set a security question and save your recovery code in case you forget your password.</p>
+
+          <div class="form-group">
+            <label>Security Question</label>
+            <select id="securityQuestion">
+              <option value="">Choose a question…</option>
+              <option value="pet">What was the name of your first pet?</option>
+              <option value="school">What was the name of your elementary school?</option>
+              <option value="city">In what city were you born?</option>
+              <option value="mother">What is your mother’s maiden name?</option>
+              <option value="book">What is your favorite book?</option>
+              <option value="custom">Custom question…</option>
+            </select>
+          </div>
+          <div class="form-group" id="customQuestionGroup" style="display:none;">
+            <label>Custom Question</label>
+            <input type="text" id="customQuestion" placeholder="Type your own security question" />
+          </div>
+          <div class="form-group">
+            <label>Answer</label>
+            <input type="text" id="securityAnswer" placeholder="Your answer (case-insensitive)" />
+          </div>
+          <div class="form-group">
+            <label>Recovery Code</label>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <input type="text" id="recoveryCodeDisplay" readonly style="flex:1;font-family:monospace;letter-spacing:0.05em;" />
+              <button class="btn btn-secondary" id="copyRecoveryCode" type="button" style="padding:0.6rem 0.9rem;white-space:nowrap;">Copy</button>
+              <button class="btn btn-secondary" id="regenRecoveryCode" type="button" style="padding:0.6rem 0.9rem;white-space:nowrap;">New</button>
+            </div>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.35rem;">Save this code somewhere safe. It can reset your password.</p>
+          </div>
+
+          <div class="form-actions" style="gap:0.6rem;flex-wrap:wrap;margin-top:1.2rem;">
+            <button class="btn btn-primary" id="saveNewPass" style="flex:1;">Save Changes</button>
+            <button class="btn btn-secondary" id="cancelChangePass" style="flex:1;">Close</button>
+            <button class="btn btn-secondary" id="signOutBtn" style="flex:1;color:#c45c3e;border-color:#e8a090;">Sign Out</button>
+          </div>
         </div>
-        <p style="margin-top:1rem;font-size:0.8rem;color:var(--text-muted);text-align:center;">
-          Default password: <code>creator</code> · You can change it after signing in.
-        </p>
       </div>
     </div>
   </div>
@@ -850,7 +985,39 @@
     const FAV_KEY = 'myArtFavorites_v2';
     const AUTH_KEY = 'myArtAuth_v1';
     const PASS_KEY = 'myArtPass_v1';
+    const RECOVERY_KEY = 'myArtRecovery_v1';
     const DEFAULT_PASSWORD = 'creator';
+
+    const SECURITY_QUESTIONS = {
+      pet: 'What was the name of your first pet?',
+      school: 'What was the name of your elementary school?',
+      city: 'In what city were you born?',
+      mother: "What is your mother's maiden name?",
+      book: 'What is your favorite book?'
+    };
+
+    function generateRecoveryCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let parts = [];
+      for (let p = 0; p < 3; p++) {
+        let part = '';
+        for (let i = 0; i < 4; i++) part += chars[Math.floor(Math.random() * chars.length)];
+        parts.push(part);
+      }
+      return parts.join('-');
+    }
+
+    function getRecovery() {
+      try {
+        return JSON.parse(localStorage.getItem(RECOVERY_KEY) || 'null');
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveRecovery(data) {
+      localStorage.setItem(RECOVERY_KEY, JSON.stringify(data));
+    }
 
     let projects = [];
     let favorites = new Set();
@@ -893,7 +1060,7 @@
         document.body.classList.add('is-creator');
         status.textContent = 'Creator';
         status.classList.add('signed-in');
-        btn.textContent = 'Sign out';
+        btn.textContent = 'Account';
       } else {
         document.body.classList.remove('is-creator');
         status.textContent = 'Viewer';
@@ -902,25 +1069,175 @@
       }
     }
 
+    function showAuthSection(section) {
+      document.getElementById('signInFields').style.display = section === 'signin' ? 'block' : 'none';
+      document.getElementById('recoverFields').style.display = section === 'recover' ? 'block' : 'none';
+      document.getElementById('changePassFields').style.display = section === 'account' ? 'block' : 'none';
+    }
+
     function openAuthModal() {
+      // Reset fields
+      ['authPassword','currentPassword','newPassword','confirmPassword',
+       'recoverAnswer','recoverCode','recoverNewPass','securityAnswer','customQuestion'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.getElementById('customQuestionGroup').style.display = 'none';
+
       if (isCreator) {
-        // Sign out
-        isCreator = false;
-        localStorage.removeItem(AUTH_KEY);
-        updateAuthUI();
-        // Close detail if open so mod panel updates
-        document.getElementById('detailModal').classList.remove('open');
-        showToast('Signed out. You are now in viewer mode.');
+        // Account / change password + recovery setup
+        document.getElementById('authModalTitle').textContent = 'Account & Recovery';
+        document.getElementById('authModalDesc').textContent = 'Change your password, set up recovery, or sign out.';
+        showAuthSection('account');
+
+        // Load existing recovery data
+        const rec = getRecovery();
+        const qSelect = document.getElementById('securityQuestion');
+        if (rec && rec.questionKey) {
+          qSelect.value = rec.questionKey;
+          if (rec.questionKey === 'custom') {
+            document.getElementById('customQuestionGroup').style.display = 'block';
+            document.getElementById('customQuestion').value = rec.questionText || '';
+          }
+          document.getElementById('securityAnswer').value = '';
+        } else {
+          qSelect.value = '';
+        }
+        // Recovery code
+        let code = (rec && rec.code) ? rec.code : generateRecoveryCode();
+        if (!rec || !rec.code) {
+          saveRecovery({ ...(rec || {}), code });
+        }
+        document.getElementById('recoveryCodeDisplay').value = code;
+
+        document.getElementById('authModal').classList.add('open');
+        setTimeout(() => document.getElementById('currentPassword').focus(), 100);
         return;
       }
-      document.getElementById('authPassword').value = '';
-      document.getElementById('newPassword').value = '';
-      document.getElementById('setPasswordGroup').style.display = 'none';
+
+      // Sign in
       document.getElementById('authModalTitle').textContent = 'Creator Sign In';
       document.getElementById('authModalDesc').textContent = 'Enter your creator password to add projects, moderate comments, and manage your portfolio.';
-      document.getElementById('authSubmit').textContent = 'Sign In';
+      showAuthSection('signin');
       document.getElementById('authModal').classList.add('open');
       setTimeout(() => document.getElementById('authPassword').focus(), 100);
+    }
+
+    function openRecoverForm() {
+      const rec = getRecovery();
+      if (!rec || (!rec.answer && !rec.code)) {
+        showToast('No recovery options set up yet. Sign in with the default password and set them up under Account.');
+        return;
+      }
+      document.getElementById('authModalTitle').textContent = 'Reset Password';
+      document.getElementById('authModalDesc').textContent = 'Answer your security question or enter your recovery code.';
+      // Show question
+      const qText = rec.questionText || SECURITY_QUESTIONS[rec.questionKey] || 'Security question';
+      document.getElementById('recoverQuestionDisplay').textContent = qText;
+      document.getElementById('recoverAnswer').value = '';
+      document.getElementById('recoverCode').value = '';
+      document.getElementById('recoverNewPass').value = '';
+      showAuthSection('recover');
+    }
+
+    function resetPassword() {
+      const rec = getRecovery();
+      if (!rec) {
+        showToast('No recovery data found.');
+        return;
+      }
+
+      const answer = document.getElementById('recoverAnswer').value.trim().toLowerCase();
+      const code = document.getElementById('recoverCode').value.trim().toUpperCase().replace(/\s/g, '');
+      const newPass = document.getElementById('recoverNewPass').value;
+
+      if (!newPass || newPass.length < 4) {
+        showToast('New password must be at least 4 characters.');
+        return;
+      }
+
+      const answerOk = rec.answer && answer && answer === rec.answer.toLowerCase();
+      const codeOk = rec.code && code && code === rec.code.toUpperCase();
+
+      if (!answerOk && !codeOk) {
+        showToast('Incorrect answer or recovery code.');
+        return;
+      }
+
+      localStorage.setItem(PASS_KEY, newPass);
+      document.getElementById('authModal').classList.remove('open');
+      showToast('Password reset successfully! You can now sign in.');
+    }
+
+    function changePassword() {
+      const current = document.getElementById('currentPassword').value;
+      const next = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      const stored = localStorage.getItem(PASS_KEY) || DEFAULT_PASSWORD;
+
+      // Password change is optional if only updating recovery
+      const changingPass = current || next || confirm;
+
+      if (changingPass) {
+        if (!current || !next || !confirm) {
+          showToast('Please fill in all password fields to change password.');
+          return;
+        }
+        if (current !== stored) {
+          showToast('Current password is incorrect.');
+          document.getElementById('currentPassword').focus();
+          return;
+        }
+        if (next.length < 4) {
+          showToast('New password must be at least 4 characters.');
+          return;
+        }
+        if (next !== confirm) {
+          showToast('New passwords do not match.');
+          return;
+        }
+        localStorage.setItem(PASS_KEY, next);
+      }
+
+      // Save recovery settings
+      const qKey = document.getElementById('securityQuestion').value;
+      const customQ = document.getElementById('customQuestion').value.trim();
+      const answer = document.getElementById('securityAnswer').value.trim();
+      const code = document.getElementById('recoveryCodeDisplay').value.trim();
+
+      if (qKey) {
+        if (qKey === 'custom' && !customQ) {
+          showToast('Please enter a custom security question.');
+          return;
+        }
+        if (!answer) {
+          showToast('Please enter an answer for the security question.');
+          return;
+        }
+        const questionText = qKey === 'custom' ? customQ : (SECURITY_QUESTIONS[qKey] || qKey);
+        saveRecovery({
+          questionKey: qKey,
+          questionText,
+          answer: answer.toLowerCase(),
+          code: code || generateRecoveryCode()
+        });
+      } else if (code) {
+        // Keep existing answer, update code if needed
+        const existing = getRecovery() || {};
+        saveRecovery({ ...existing, code });
+      }
+
+      document.getElementById('authModal').classList.remove('open');
+      showToast(changingPass ? 'Password & recovery settings saved!' : 'Recovery settings saved!');
+    }
+
+    function signOut() {
+      isCreator = false;
+      localStorage.removeItem(AUTH_KEY);
+      updateAuthUI();
+      document.getElementById('authModal').classList.remove('open');
+      document.getElementById('detailModal').classList.remove('open');
+      showToast('Signed out. You are now in viewer mode.');
     }
 
     function submitAuth() {
@@ -1029,13 +1346,14 @@
       document.getElementById('statFav').textContent = favorites.size;
       document.getElementById('statAvg').textContent = avg;
 
-      const featured = [...projects]
+      const publicProjects = isCreator ? projects : projects.filter(p => !p.hidden);
+      const featured = [...publicProjects]
         .sort((a, b) => (b.rating * 10 + (b.views || 0)) - (a.rating * 10 + (a.views || 0)))
         .slice(0, 3);
       document.getElementById('featuredGrid').innerHTML =
         featured.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
 
-      const recent = [...projects].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
+      const recent = [...publicProjects].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
       document.getElementById('recentGrid').innerHTML =
         recent.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
     }
@@ -1046,6 +1364,13 @@
       const searchId = isMy ? 'searchMyArt' : 'searchAIArt';
       const sortId = isMy ? 'sortMyArt' : 'sortAIArt';
       const ratingId = isMy ? 'filterRatingMyArt' : 'filterRatingAIArt';
+      const showHiddenId = isMy ? 'showHiddenMyArt' : 'showHiddenAIArt';
+
+      // Hide archived projects from viewers; creators can toggle "Show hidden"
+      const showHidden = isCreator && document.getElementById(showHiddenId)?.checked;
+      if (!showHidden) {
+        list = list.filter(p => !p.hidden);
+      }
 
       const q = document.getElementById(searchId).value.toLowerCase().trim();
       if (q) {
@@ -1094,30 +1419,44 @@
     }
 
     function renderFavorites() {
-      const list = projects.filter(p => favorites.has(p.id));
+      let list = projects.filter(p => favorites.has(p.id));
+      if (!isCreator) list = list.filter(p => !p.hidden);
       document.getElementById('favGrid').innerHTML = list.length
         ? list.map(p => createCard(p)).join('')
         : emptyHTML('No favorites yet. Click the heart on any project!');
     }
 
-    function createCard(p) {
+    function getVisibleImages(p) {
       const imgs = p.images || (p.image ? [p.image] : []);
-      const primary = imgs[0] || '';
+      const hiddenIdx = p.hiddenImages || [];
+      // For public/viewers always filter; for creator card preview also prefer visible
+      return imgs
+        .map((src, i) => ({ src, i, hidden: hiddenIdx.includes(i) }))
+        .filter(x => !x.hidden);
+    }
+
+    function createCard(p) {
+      const allImgs = p.images || (p.image ? [p.image] : []);
+      const visible = getVisibleImages(p);
+      const primary = (visible[0] && visible[0].src) || allImgs[0] || '';
       const stars = '★'.repeat(p.rating) + '☆'.repeat(5 - p.rating);
       const badge = p.category === 'ai-art'
         ? `<span class="art-card-badge ai">${p.aiTool || 'AI'} · ${p.aiPercent || '?'}%</span>`
         : `<span class="art-card-badge">Original</span>`;
-      const multi = imgs.length > 1 ? `<span class="multi-badge">${imgs.length} images</span>` : '';
+      const multi = visible.length > 1 ? `<span class="multi-badge">${visible.length} images</span>` : '';
+      const hiddenBadge = p.hidden ? `<span class="hidden-badge">Hidden</span>` : '';
       const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
       const comments = (p.comments || []).filter(c => !c.hidden).length;
       const isFav = favorites.has(p.id);
+      const cardClass = p.hidden ? 'art-card hidden-project' : 'art-card';
 
       return `
-        <article class="art-card" data-id="${p.id}">
+        <article class="${cardClass}" data-id="${p.id}">
           <div class="art-card-image">
             <img src="${primary}" alt="${escapeHtml(p.title)}" loading="lazy" />
             ${badge}
             ${multi}
+            ${hiddenBadge}
             <button class="fav-btn ${isFav ? 'favorited' : ''}" data-fav="${p.id}" title="Favorite">
               ${isFav ? '♥' : '♡'}
             </button>
@@ -1160,26 +1499,43 @@
       p.views = (p.views || 0) + 1;
       saveData();
 
-      const imgs = p.images || (p.image ? [p.image] : []);
-      document.getElementById('detailImage').src = imgs[0] || '';
+      const allImgs = p.images || (p.image ? [p.image] : []);
+      const hiddenIdx = p.hiddenImages || [];
+      // Public sees only visible images; creator sees all when managing
+      const displayImgs = isCreator
+        ? allImgs.map((src, i) => ({ src, i, hidden: hiddenIdx.includes(i) }))
+        : getVisibleImages(p);
+
+      const firstVisible = displayImgs.find(x => !x.hidden) || displayImgs[0];
+      currentImageIndex = firstVisible ? firstVisible.i : 0;
+      document.getElementById('detailImage').src = firstVisible ? firstVisible.src : '';
       document.getElementById('detailTitle').textContent = p.title;
 
       let meta = p.materials || '';
       if (p.category === 'ai-art') meta += ` · AI: ${p.aiTool || 'Unknown'} (${p.aiPercent || '?'}%)`;
-      meta += ` · Added ${formatDate(p.createdAt)} · ${p.views} views`;
+      meta += ` · Added ${formatDate(p.createdAt)} · ${p.views || 0} views`;
+      if (p.hidden) meta += ' · 👁 Hidden from public gallery';
       document.getElementById('detailMeta').textContent = meta;
 
-      // Thumbs
+      // Thumbs — only show non-hidden to viewers; creator sees all
       const strip = document.getElementById('thumbStrip');
-      if (imgs.length > 1) {
+      const thumbsToShow = isCreator ? displayImgs : displayImgs.filter(x => !x.hidden);
+      if (thumbsToShow.length > 1) {
         strip.style.display = 'flex';
-        strip.innerHTML = imgs.map((src, i) =>
-          `<img src="${src}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="thumb" />`
+        strip.innerHTML = thumbsToShow.map((item) =>
+          `<img src="${item.src}" class="${item.i === currentImageIndex ? 'active' : ''}" data-idx="${item.i}" alt="thumb" style="${item.hidden ? 'opacity:0.4;border-style:dashed;' : ''}" />`
         ).join('');
       } else {
-        strip.style.display = 'none';
+        strip.style.display = thumbsToShow.length === 1 ? 'none' : 'none';
         strip.innerHTML = '';
       }
+
+      // Hide/restore button state
+      const hideBtn = document.getElementById('hideProjectBtn');
+      if (hideBtn) {
+        hideBtn.textContent = p.hidden ? '👁 Restore to gallery' : '👁 Hide from gallery';
+      }
+      document.getElementById('imageManagePanel').style.display = 'none';
 
       // Stars
       const starsEl = document.getElementById('detailStars');
@@ -1482,6 +1838,78 @@
       switchView(category === 'my-art' ? 'my-art' : 'ai-art');
     }
 
+    // ========== HIDE / ARCHIVE ==========
+    function toggleHideProject() {
+      if (!isCreator || !currentProjectId) return;
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      p.hidden = !p.hidden;
+      saveData();
+      openDetail(currentProjectId);
+      renderAll();
+      showToast(p.hidden ? 'Project hidden from public gallery (still in your data).' : 'Project restored to public gallery.');
+    }
+
+    function toggleManageImages() {
+      if (!isCreator || !currentProjectId) return;
+      const panel = document.getElementById('imageManagePanel');
+      const isOpen = panel.style.display !== 'none';
+      if (isOpen) {
+        panel.style.display = 'none';
+        return;
+      }
+      renderImageManager();
+      panel.style.display = 'block';
+    }
+
+    function renderImageManager() {
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      const imgs = p.images || [];
+      const hiddenIdx = p.hiddenImages || [];
+      const list = document.getElementById('imgManageList');
+      if (imgs.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;">No images</p>';
+        return;
+      }
+      list.innerHTML = imgs.map((src, i) => {
+        const isHidden = hiddenIdx.includes(i);
+        return `
+          <div class="img-manage-item ${isHidden ? 'hidden-img' : ''}" data-img-idx="${i}">
+            <img src="${src}" alt="img ${i+1}" />
+            <button class="img-action" data-toggle-img="${i}" title="${isHidden ? 'Restore image' : 'Hide image'}">
+              ${isHidden ? '↩' : '×'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleImageHidden(imgIndex) {
+      if (!isCreator || !currentProjectId) return;
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+      if (!p.hiddenImages) p.hiddenImages = [];
+      const idx = p.hiddenImages.indexOf(imgIndex);
+      if (idx >= 0) {
+        p.hiddenImages.splice(idx, 1);
+        showToast('Image restored to public view.');
+      } else {
+        // Don't allow hiding the last visible image without hiding the whole project
+        const visibleCount = (p.images || []).length - p.hiddenImages.length;
+        if (visibleCount <= 1) {
+          showToast('Cannot hide the last visible image. Hide the whole project instead.');
+          return;
+        }
+        p.hiddenImages.push(imgIndex);
+        showToast('Image hidden from public view (kept in your data).');
+      }
+      saveData();
+      renderImageManager();
+      openDetail(currentProjectId);
+      renderAll();
+    }
+
     // ========== EXPORT ==========
     function exportJSON() {
       if (!isCreator) {
@@ -1562,6 +1990,43 @@
       document.getElementById('authPassword').addEventListener('keydown', e => {
         if (e.key === 'Enter') submitAuth();
       });
+      document.getElementById('forgotPassBtn').addEventListener('click', openRecoverForm);
+      document.getElementById('backToSignIn').addEventListener('click', () => {
+        document.getElementById('authModalTitle').textContent = 'Creator Sign In';
+        document.getElementById('authModalDesc').textContent = 'Enter your creator password to add projects, moderate comments, and manage your portfolio.';
+        showAuthSection('signin');
+      });
+      document.getElementById('resetPassBtn').addEventListener('click', resetPassword);
+      document.getElementById('saveNewPass').addEventListener('click', changePassword);
+      document.getElementById('cancelChangePass').addEventListener('click', () => {
+        document.getElementById('authModal').classList.remove('open');
+      });
+      document.getElementById('signOutBtn').addEventListener('click', signOut);
+      document.getElementById('copyRecoveryCode').addEventListener('click', () => {
+        const code = document.getElementById('recoveryCodeDisplay').value;
+        navigator.clipboard.writeText(code).then(() => showToast('Recovery code copied!'));
+      });
+      document.getElementById('regenRecoveryCode').addEventListener('click', () => {
+        const code = generateRecoveryCode();
+        document.getElementById('recoveryCodeDisplay').value = code;
+        const rec = getRecovery() || {};
+        saveRecovery({ ...rec, code });
+        showToast('New recovery code generated. Save it!');
+      });
+      document.getElementById('securityQuestion').addEventListener('change', (e) => {
+        document.getElementById('customQuestionGroup').style.display =
+          e.target.value === 'custom' ? 'block' : 'none';
+      });
+      ['currentPassword', 'newPassword', 'confirmPassword'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', e => {
+          if (e.key === 'Enter') changePassword();
+        });
+      });
+      ['recoverAnswer', 'recoverCode', 'recoverNewPass'].forEach(id => {
+        document.getElementById(id).addEventListener('keydown', e => {
+          if (e.key === 'Enter') resetPassword();
+        });
+      });
       document.getElementById('closeUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
       document.getElementById('cancelUpload').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('open'));
       document.getElementById('closeDetail').addEventListener('click', () => document.getElementById('detailModal').classList.remove('open'));
@@ -1602,6 +2067,16 @@
         if (currentProjectId) toggleFavorite(currentProjectId);
       });
       document.getElementById('shareBtn').addEventListener('click', shareProject);
+      document.getElementById('hideProjectBtn').addEventListener('click', toggleHideProject);
+      document.getElementById('manageImagesBtn').addEventListener('click', toggleManageImages);
+
+      document.getElementById('imgManageList').addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-toggle-img]');
+        if (btn) toggleImageHidden(parseInt(btn.dataset.toggleImg));
+      });
+
+      document.getElementById('showHiddenMyArt')?.addEventListener('change', () => renderGallery('my-art'));
+      document.getElementById('showHiddenAIArt')?.addEventListener('change', () => renderGallery('ai-art'));
 
       // Thumbnails with smooth fade
       document.getElementById('thumbStrip').addEventListener('click', e => {
