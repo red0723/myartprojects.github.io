@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyArtProjects – Personal Art Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Light Mode - Warm Studio */
+      --bg: #f8f4ef;
+      --bg-card: #ffffff;
+      --bg-soft: #f0e9e0;
+      --text: #2c2420;
+      --text-muted: #6b5e54;
+      --accent: #c45c3e;
+      --accent-soft: #e8a090;
+      --accent-2: #5b8a7a;
+      --border: #e5d9cc;
+      --shadow: 0 8px 30px rgba(44, 36, 32, 0.08);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Inter', sans-serif;
+      --transition: 0.25s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1614;
+      --bg-card: #2a2420;
+      --bg-soft: #332c27;
+      --text: #f5efe8;
+      --text-muted: #b0a297;
+      --accent: #e07a5f;
+      --accent-soft: #c45c3e;
+      --accent-2: #81b29a;
+      --border: #3d342e;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(248, 244, 239, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: background var(--transition);
+    }
+
+    [data-theme="dark"] .header {
+      background: rgba(26, 22, 20, 0.92);
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span {
+      font-weight: 400;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .nav {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition);
+      font-family: var(--font-body);
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-soft);
+      color: var(--text);
+    }
+
+    .nav-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-toggle, .upload-btn {
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.15rem;
+      transition: all var(--transition);
+      color: var(--text);
+    }
+
+    .theme-toggle:hover, .upload-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .upload-btn {
+      width: auto;
+      padding: 0 1.1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      gap: 0.4rem;
+    }
+
+    /* ========== MAIN LAYOUT ========== */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== DASHBOARD ========== */
+    .dashboard-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .dashboard-header h1 {
+      font-family: var(--font-display);
+      font-size: 2.6rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .dashboard-header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem 1.5rem;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+    }
+
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-card .value {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ========== GALLERY CONTROLS ========== */
+    .gallery-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.6rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-box::before {
+      content: '🔍';
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      opacity: 0.6;
+    }
+
+    .filter-select {
+      padding: 0.7rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: var(--font-body);
+      cursor: pointer;
+      outline: none;
+    }
+
+    /* ========== ARTWORK GRID ========== */
+    .artwork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.6rem;
+    }
+
+    .art-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .art-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(44, 36, 32, 0.12);
+    }
+
+    .art-card-image {
+      position: relative;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+      background: var(--bg-soft);
+    }
+
+    .art-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .art-card:hover .art-card-image img {
+      transform: scale(1.05);
+    }
+
+    .art-card-badge {
+      position: absolute;
+      top: 0.8rem;
+      left: 0.8rem;
+      background: rgba(0,0,0,0.65);
+      color: white;
+      font-size: 0.72rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    .art-card-badge.ai {
+      background: rgba(91, 138, 122, 0.9);
+    }
+
+    .art-card-body {
+      padding: 1.2rem 1.3rem 1.4rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .art-card-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+
+    .art-card-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .art-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .tag {
+      background: var(--bg-soft);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    .art-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .stars {
+      color: #e8b923;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+    }
+
+    .comment-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state .icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    /* ========== MODAL ========== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 22, 20, 0.65);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+      position: relative;
+      animation: modalIn 0.3s ease;
+    }
+
+    @keyframes modalIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--bg-soft);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: var(--text);
+      z-index: 5;
+      transition: background var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .modal-image {
+      width: 100%;
+      max-height: 360px;
+      object-fit: cover;
+      background: var(--bg-soft);
+    }
+
+    .modal-body {
+      padding: 1.8rem 2rem 2.2rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-meta {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .rating-section {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .star-btn {
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+      cursor: pointer;
+      color: #ccc;
+      transition: color 0.15s, transform 0.15s;
+      padding: 0;
+    }
+
+    .star-btn.filled {
+      color: #e8b923;
+    }
+
+    .star-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .comments-section h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+    }
+
+    .comment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .comment {
+      background: var(--bg-soft);
+      padding: 0.9rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+    }
+
+    .comment.hidden-comment {
+      opacity: 0.5;
+      font-style: italic;
+    }
+
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .comment-form {
+      display: flex;
+      gap: 0.7rem;
+    }
+
+    .comment-form input {
+      flex: 1;
+      padding: 0.75rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .comment-form input:focus {
+      border-color: var(--accent);
+    }
+
+    .comment-form button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0 1.3rem;
+      border-radius: 999px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition);
+      font-family: var(--font-body);
+    }
+
+    .comment-form button:hover {
+      background: var(--accent-soft);
+    }
+
+    /* ========== UPLOAD MODAL ========== */
+    .upload-form {
+      padding: 2rem;
+    }
+
+    .upload-form h2 {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.3rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--bg-soft);
+      margin-bottom: 1.3rem;
+    }
+
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(196, 92, 62, 0.08);
+    }
+
+    .drop-zone p {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .drop-zone .icon {
+      font-size: 2.5rem;
+      opacity: 0.5;
+    }
+
+    .preview-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .preview-images img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: flex-end;
+      margin-top: 1.8rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-body);
+      transition: all var(--transition);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-soft);
+    }
+
+    .btn-secondary {
+      background: var(--bg-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    /* ========== TOAST ========== */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text);
+      color: var(--bg);
+      padding: 0.9rem 1.4rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+      z-index: 300;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ========== BACK TO TOP ========== */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--transition);
+      z-index: 50;
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .back-to-top:hover {
+      transform: translateY(-3px);
+      background: var(--accent-soft);
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px) {
+      .header {
+        flex-wrap: wrap;
+        padding: 0.8rem 1rem;
+      }
+
+      .logo {
+        font-size: 1.4rem;
+      }
+
+      .nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.5rem;
+      }
+
+      .dashboard-header h1 {
+        font-size: 2rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-body {
+        padding: 1.4rem 1.3rem;
+      }
+
+      .upload-btn span {
+        display: none;
+      }
+    }
+
+    /* Watermark simulation (visual only) */
+    .watermarked::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 40px,
+        rgba(255,255,255,0.03) 40px,
+        rgba(255,255,255,0.03) 80px
+      );
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      MyArt<span>Projects</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="my-art">My Art</button>
+      <button class="nav-btn" data-view="ai-art">AI + My Art</button>
+    </nav>
+    <div class="header-actions">
+      <button class="upload-btn" id="openUpload" title="Add new project">
+        ＋ <span>Add Project</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="Toggle light/dark mode">🌙</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard" class="view active">
+      <div class="dashboard-header">
+        <h1>Welcome to your studio</h1>
+        <p>Organize, showcase, and celebrate your creative journey.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Total Projects</div>
+          <div class="value" id="statTotal">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">My Art</div>
+          <div class="value" id="statMyArt">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">AI-Assisted</div>
+          <div class="value" id="statAI">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Avg Rating</div>
+          <div class="value" id="statAvg">—</div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Featured Artwork</h2>
+      <div class="artwork-grid" id="featuredGrid"></div>
+
+      <h2 class="section-title" style="margin-top: 2.5rem;">Recently Added</h2>
+      <div class="artwork-grid" id="recentGrid"></div>
+    </section>
+
+    <!-- MY ART VIEW -->
+    <section id="my-art" class="view">
+      <div class="dashboard-header">
+        <h1>My Art</h1>
+        <p>Artwork created entirely by you.</p>
+      </div>
+      <div class="gallery-controls">
+        <div class="search-box">
+          <input type="text" id="searchMyArt" placeholder="Search title, tags, materials..." />
+        </div>
+        <select class="filter-select" id="sortMyArt">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="highest">Highest rated</option>
+          <option value="most-comments">Most comments</option>
+        </select>
+        <select class="filter-select" id="filterRatingMyArt">
+          <option value="all">All ratings</option>
+          <option value="5">5 stars</option>
+          <option value="4">4+ stars</option>
+          <option value="3">3+ stars</option>
+        </select>
+      </div>
+      <div class="artwork-grid" id="myArtGrid"></div>
+    </section>
+
+    <!-- AI ART VIEW -->
+    <section id="ai-art" class="view">
+      <div class="dashboard-header">
+        <h1>AI Art Combined</h1>
+        <p>Projects that blend AI-generated content with your original artwork.</p>
+      </div>
+      <div class="gallery-controls">
+        <div class="search-box">
+          <input type="text" id="searchAIArt" placeholder="Search title, AI tool, tags..." />
+        </div>
+        <select class="filter-select" id="sortAIArt">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="highest">Highest rated</option>
+          <option value="most-comments">Most comments</option>
+        </select>
+        <select class="filter-select" id="filterRatingAIArt">
+          <option value="all">All ratings</option>
+          <option value="5">5 stars</option>
+          <option value="4">4+ stars</option>
+          <option value="3">3+ stars</option>
+        </select>
+      </div>
+      <div class="artwork-grid" id="aiArtGrid"></div>
+    </section>
+  </main>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <button class="modal-close" id="closeDetail">×</button>
+      <img class="modal-image" id="detailImage" src="" alt="" />
+      <div class="modal-body">
+        <h2 class="modal-title" id="detailTitle"></h2>
+        <div class="modal-meta" id="detailMeta"></div>
+        <div class="rating-section">
+          <span style="font-size:0.9rem;color:var(--text-muted)">Your rating:</span>
+          <div id="detailStars"></div>
+          <span id="detailRatingText" style="font-size:0.9rem;color:var(--text-muted)"></span>
+        </div>
+        <div class="art-card-tags" id="detailTags"></div>
+        <div class="comments-section">
+          <h3>Comments</h3>
+          <div class="comment-list" id="commentList"></div>
+          <div class="comment-form">
+            <input type="text" id="commentInput" placeholder="Share your thoughts..." maxlength="300" />
+            <button id="submitComment">Post</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPLOAD MODAL -->
+  <div class="modal-overlay" id="uploadModal">
+    <div class="modal">
+      <button class="modal-close" id="closeUpload">×</button>
+      <div class="upload-form">
+        <h2>Add New Project</h2>
+        <div class="drop-zone" id="dropZone">
+          <div class="icon">🖼️</div>
+          <p><strong>Drag & drop</strong> images here or click to browse</p>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden />
+        </div>
+        <div class="preview-images" id="previewImages"></div>
+
+        <div class="form-group">
+          <label>Project Title *</label>
+          <input type="text" id="projectTitle" placeholder="e.g. Sunset Over the Lake" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="projectCategory">
+              <option value="my-art">My Art (100% original)</option>
+              <option value="ai-art">AI Art Combined</option>
+            </select>
+          </div>
+          <div class="form-group" id="aiToolGroup" style="display:none;">
+            <label>AI Tool Used</label>
+            <select id="aiTool">
+              <option value="Midjourney">Midjourney</option>
+              <option value="DALL·E">DALL·E</option>
+              <option value="Copilot">Copilot</option>
+              <option value="Stable Diffusion">Stable Diffusion</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" id="aiPercentGroup" style="display:none;">
+          <label>AI Contribution (%)</label>
+          <input type="number" id="aiPercent" min="1" max="99" value="40" />
+        </div>
+
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input type="text" id="projectTags" placeholder="landscape, oil, nature, warm tones" />
+        </div>
+
+        <div class="form-group">
+          <label>Materials / Tools Used</label>
+          <input type="text" id="projectMaterials" placeholder="Oil on canvas, 16×20 in" />
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-secondary" id="cancelUpload">Cancel</button>
+          <button class="btn btn-primary" id="saveProject">Save Project</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- BACK TO TOP -->
+  <button class="back-to-top" id="backToTop" title="Back to top">↑</button>
+
+  <script>
+    // ========== DATA & STATE ==========
+    const STORAGE_KEY = 'myArtProjects_v1';
+    let projects = [];
+    let currentProjectId = null;
+    let uploadedFiles = []; // temporary base64 previews
+
+    // Simple bad-word filter (basic moderation)
+    const BAD_WORDS = ['spam', 'idiot', 'hate', 'stupid', 'dumb', 'sucks', 'kill', 'die'];
+
+    // ========== INITIALIZATION ==========
+    function init() {
+      loadProjects();
+      if (projects.length === 0) {
+        seedSampleData();
+      }
+      setupEventListeners();
+      applyTheme();
+      renderAll();
+    }
+
+    function loadProjects() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        projects = raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        projects = [];
+      }
+    }
+
+    function saveProjects() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    }
+
+    function seedSampleData() {
+      const now = Date.now();
+      projects = [
+        {
+          id: 'p1',
+          title: 'Golden Hour Valley',
+          category: 'my-art',
+          image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+          tags: ['landscape', 'oil', 'nature'],
+          materials: 'Oil on canvas, 24×36 in',
+          rating: 5,
+          comments: [
+            { id: 'c1', text: 'Absolutely stunning light!', author: 'Viewer', time: now - 86400000, hidden: false }
+          ],
+          createdAt: now - 5 * 86400000,
+          views: 42
+        },
+        {
+          id: 'p2',
+          title: 'Abstract Flow',
+          category: 'my-art',
+          image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80',
+          tags: ['abstract', 'acrylic', 'color'],
+          materials: 'Acrylic on panel',
+          rating: 4,
+          comments: [],
+          createdAt: now - 3 * 86400000,
+          views: 28
+        },
+        {
+          id: 'p3',
+          title: 'Dream Forest (AI Assisted)',
+          category: 'ai-art',
+          image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+          tags: ['fantasy', 'forest', 'digital'],
+          materials: 'Digital + traditional sketch',
+          aiTool: 'Midjourney',
+          aiPercent: 55,
+          rating: 5,
+          comments: [
+            { id: 'c2', text: 'Beautiful blend of styles!', author: 'Viewer', time: now - 43200000, hidden: false }
+          ],
+          createdAt: now - 2 * 86400000,
+          views: 67
+        },
+        {
+          id: 'p4',
+          title: 'Portrait Study',
+          category: 'my-art',
+          image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=80',
+          tags: ['portrait', 'charcoal'],
+          materials: 'Charcoal on paper',
+          rating: 4,
+          comments: [],
+          createdAt: now - 1 * 86400000,
+          views: 19
+        },
+        {
+          id: 'p5',
+          title: 'Neon City Dreams',
+          category: 'ai-art',
+          image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80',
+          tags: ['cityscape', 'cyberpunk', 'digital'],
+          materials: 'Digital painting',
+          aiTool: 'DALL·E',
+          aiPercent: 70,
+          rating: 3,
+          comments: [],
+          createdAt: now - 0.5 * 86400000,
+          views: 31
+        }
+      ];
+      saveProjects();
+    }
+
+    // ========== RENDERING ==========
+    function renderAll() {
+      renderDashboard();
+      renderGallery('my-art');
+      renderGallery('ai-art');
+    }
+
+    function renderDashboard() {
+      const myArt = projects.filter(p => p.category === 'my-art');
+      const aiArt = projects.filter(p => p.category === 'ai-art');
+      const rated = projects.filter(p => p.rating > 0);
+      const avg = rated.length
+        ? (rated.reduce((s, p) => s + p.rating, 0) / rated.length).toFixed(1)
+        : '—';
+
+      document.getElementById('statTotal').textContent = projects.length;
+      document.getElementById('statMyArt').textContent = myArt.length;
+      document.getElementById('statAI').textContent = aiArt.length;
+      document.getElementById('statAvg').textContent = avg;
+
+      // Featured = highest rated + most viewed
+      const featured = [...projects]
+        .sort((a, b) => (b.rating * 10 + b.views) - (a.rating * 10 + a.views))
+        .slice(0, 3);
+      document.getElementById('featuredGrid').innerHTML = featured.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
+
+      // Recent
+      const recent = [...projects].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4);
+      document.getElementById('recentGrid').innerHTML = recent.map(p => createCard(p)).join('') || emptyHTML('No projects yet');
+    }
+
+    function renderGallery(category) {
+      const isMyArt = category === 'my-art';
+      const gridId = isMyArt ? 'myArtGrid' : 'aiArtGrid';
+      const searchId = isMyArt ? 'searchMyArt' : 'searchAIArt';
+      const sortId = isMyArt ? 'sortMyArt' : 'sortAIArt';
+      const ratingId = isMyArt ? 'filterRatingMyArt' : 'filterRatingAIArt';
+
+      let list = projects.filter(p => p.category === category);
+
+      // Search
+      const q = document.getElementById(searchId).value.toLowerCase().trim();
+      if (q) {
+        list = list.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          (p.tags || []).some(t => t.toLowerCase().includes(q)) ||
+          (p.materials || '').toLowerCase().includes(q) ||
+          (p.aiTool || '').toLowerCase().includes(q)
+        );
+      }
+
+      // Rating filter
+      const minRating = document.getElementById(ratingId).value;
+      if (minRating !== 'all') {
+        list = list.filter(p => p.rating >= parseInt(minRating));
+      }
+
+      // Sort
+      const sort = document.getElementById(sortId).value;
+      list.sort((a, b) => {
+        if (sort === 'newest') return b.createdAt - a.createdAt;
+        if (sort === 'oldest') return a.createdAt - b.createdAt;
+        if (sort === 'highest') return b.rating - a.rating;
+        if (sort === 'most-comments') return (b.comments?.length || 0) - (a.comments?.length || 0);
+        return 0;
+      });
+
+      const grid = document.getElementById(gridId);
+      if (list.length === 0) {
+        grid.innerHTML = emptyHTML(isMyArt ? 'No original artwork yet. Add your first piece!' : 'No AI-assisted projects yet.');
+      } else {
+        grid.innerHTML = list.map(p => createCard(p)).join('');
+      }
+    }
+
+    function createCard(p) {
+      const stars = '★'.repeat(p.rating) + '☆'.repeat(5 - p.rating);
+      const badge = p.category === 'ai-art'
+        ? `<span class="art-card-badge ai">${p.aiTool || 'AI'} · ${p.aiPercent || '?'}%</span>`
+        : `<span class="art-card-badge">Original</span>`;
+      const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag">${t}</span>`).join('');
+      const comments = p.comments?.filter(c => !c.hidden).length || 0;
+
+      return `
+        <article class="art-card" data-id="${p.id}">
+          <div class="art-card-image watermarked">
+            <img src="${p.image}" alt="${escapeHtml(p.title)}" loading="lazy" />
+            ${badge}
+          </div>
+          <div class="art-card-body">
+            <h3 class="art-card-title">${escapeHtml(p.title)}</h3>
+            <div class="art-card-meta">${p.materials || '—'}</div>
+            <div class="art-card-tags">${tags}</div>
+            <div class="art-card-footer">
+              <span class="stars">${stars}</span>
+              <span class="comment-count">${comments} comment${comments !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function emptyHTML(msg) {
+      return `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="icon">🎨</div>
+          <h3>Nothing here yet</h3>
+          <p>${msg}</p>
+        </div>
+      `;
+    }
+
+    // ========== DETAIL MODAL ==========
+    function openDetail(id) {
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+      currentProjectId = id;
+      p.views = (p.views || 0) + 1;
+      saveProjects();
+
+      document.getElementById('detailImage').src = p.image;
+      document.getElementById('detailTitle').textContent = p.title;
+
+      let meta = p.materials || '';
+      if (p.category === 'ai-art') {
+        meta += ` · AI: ${p.aiTool || 'Unknown'} (${p.aiPercent || '?'}%)`;
+      }
+      meta += ` · Added ${formatDate(p.createdAt)}`;
+      document.getElementById('detailMeta').textContent = meta;
+
+      // Stars
+      const starsEl = document.getElementById('detailStars');
+      starsEl.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'star-btn' + (i <= p.rating ? ' filled' : '');
+        btn.textContent = '★';
+        btn.dataset.value = i;
+        btn.addEventListener('click', () => setRating(id, i));
+        starsEl.appendChild(btn);
+      }
+      document.getElementById('detailRatingText').textContent = p.rating ? `${p.rating}/5` : 'Not rated';
+
+      // Tags
+      document.getElementById('detailTags').innerHTML = (p.tags || [])
+        .map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+
+      renderComments(p);
+      document.getElementById('detailModal').classList.add('open');
+    }
+
+    function setRating(id, value) {
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+      p.rating = value;
+      saveProjects();
+      openDetail(id); // refresh
+      renderAll();
+      showToast('Rating saved!');
+    }
+
+    function renderComments(p) {
+      const list = document.getElementById('commentList');
+      const visible = (p.comments || []).filter(c => !c.hidden);
+      if (visible.length === 0) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;">No comments yet. Be the first!</p>';
+        return;
+      }
+      list.innerHTML = visible.map(c => `
+        <div class="comment">
+          <div class="comment-header">
+            <span>${escapeHtml(c.author || 'Anonymous')}</span>
+            <span>${formatDate(c.time)}</span>
+          </div>
+          <div>${escapeHtml(c.text)}</div>
+        </div>
+      `).join('');
+    }
+
+    function submitComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text || !currentProjectId) return;
+
+      const p = projects.find(x => x.id === currentProjectId);
+      if (!p) return;
+
+      const lower = text.toLowerCase();
+      const isBad = BAD_WORDS.some(w => lower.includes(w));
+
+      const comment = {
+        id: 'c' + Date.now(),
+        text,
+        author: 'You',
+        time: Date.now(),
+        hidden: isBad
+      };
+
+      if (!p.comments) p.comments = [];
+      p.comments.push(comment);
+      saveProjects();
+
+      input.value = '';
+      renderComments(p);
+      renderAll();
+
+      if (isBad) {
+        showToast('Comment hidden due to inappropriate language.');
+      } else {
+        showToast('Comment posted!');
+      }
+    }
+
+    // ========== UPLOAD ==========
+    function openUpload() {
+      uploadedFiles = [];
+      document.getElementById('previewImages').innerHTML = '';
+      document.getElementById('projectTitle').value = '';
+      document.getElementById('projectTags').value = '';
+      document.getElementById('projectMaterials').value = '';
+      document.getElementById('projectCategory').value = 'my-art';
+      document.getElementById('aiToolGroup').style.display = 'none';
+      document.getElementById('aiPercentGroup').style.display = 'none';
+      document.getElementById('uploadModal').classList.add('open');
+    }
+
+    function handleFiles(files) {
+      [...files].forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          uploadedFiles.push(e.target.result);
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          document.getElementById('previewImages').appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function saveProject() {
+      const title = document.getElementById('projectTitle').value.trim();
+      if (!title) {
+        showToast('Please enter a title.');
+        return;
+      }
+      if (uploadedFiles.length === 0) {
+        showToast('Please add at least one image.');
+        return;
+      }
+
+      const category = document.getElementById('projectCategory').value;
+      const tags = document.getElementById('projectTags').value
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+
+      const project = {
+        id: 'p' + Date.now(),
+        title,
+        category,
+        image: uploadedFiles[0], // primary image
+        tags,
+        materials: document.getElementById('projectMaterials').value.trim(),
+        rating: 0,
+        comments: [],
+        createdAt: Date.now(),
+        views: 0
+      };
+
+      if (category === 'ai-art') {
+        project.aiTool = document.getElementById('aiTool').value;
+        project.aiPercent = parseInt(document.getElementById('aiPercent').value) || 50;
+      }
+
+      projects.unshift(project);
+      saveProjects();
+      document.getElementById('uploadModal').classList.remove('open');
+      renderAll();
+      showToast('Project added successfully!');
+
+      // Switch to correct gallery
+      switchView(category === 'my-art' ? 'my-art' : 'ai-art');
+    }
+
+    // ========== HELPERS ==========
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      document.querySelector(`.nav-btn[data-view="${viewId}"]`).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function applyTheme() {
+      const saved = localStorage.getItem('myArtTheme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('myArtTheme', next);
+      document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+    }
+
+    // ========== EVENT LISTENERS ==========
+    function setupEventListeners() {
+      // Navigation
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchView(btn.dataset.view));
+      });
+
+      // Theme
+      document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+      // Upload open/close
+      document.getElementById('openUpload').addEventListener('click', openUpload);
+      document.getElementById('closeUpload').addEventListener('click', () => {
+        document.getElementById('uploadModal').classList.remove('open');
+      });
+      document.getElementById('cancelUpload').addEventListener('click', () => {
+        document.getElementById('uploadModal').classList.remove('open');
+      });
+
+      // Category change
+      document.getElementById('projectCategory').addEventListener('change', (e) => {
+        const isAI = e.target.value === 'ai-art';
+        document.getElementById('aiToolGroup').style.display = isAI ? 'block' : 'none';
+        document.getElementById('aiPercentGroup').style.display = isAI ? 'block' : 'none';
+      });
+
+      // Drop zone
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+      // Save project
+      document.getElementById('saveProject').addEventListener('click', saveProject);
+
+      // Detail modal
+      document.getElementById('closeDetail').addEventListener('click', () => {
+        document.getElementById('detailModal').classList.remove('open');
+      });
+      document.getElementById('submitComment').addEventListener('click', submitComment);
+      document.getElementById('commentInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitComment();
+      });
+
+      // Card clicks (event delegation)
+      document.addEventListener('click', (e) => {
+        const card = e.target.closest('.art-card');
+        if (card) openDetail(card.dataset.id);
+      });
+
+      // Search & filters
+      ['searchMyArt', 'sortMyArt', 'filterRatingMyArt'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => renderGallery('my-art'));
+        document.getElementById(id).addEventListener('change', () => renderGallery('my-art'));
+      });
+      ['searchAIArt', 'sortAIArt', 'filterRatingAIArt'].forEach(id => {
+        document.getElementById(id).addEventListener('input', () => renderGallery('ai-art'));
+        document.getElementById(id).addEventListener('change', () => renderGallery('ai-art'));
+      });
+
+      // Back to top
+      const backBtn = document.getElementById('backToTop');
+      window.addEventListener('scroll', () => {
+        backBtn.classList.toggle('visible', window.scrollY > 400);
+      });
+      backBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+      // Close modals on overlay click
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) overlay.classList.remove('open');
+        });
+      });
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>
