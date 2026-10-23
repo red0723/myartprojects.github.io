@@ -636,6 +636,34 @@
       background: var(--accent-2);
     }
 
+
+    /* Save error dialog */
+    .error-dialog-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(26,22,20,0.55);
+      display: none; align-items: center; justify-content: center;
+      padding: 1.2rem;
+    }
+    .error-dialog-overlay.open { display: flex; }
+    .error-dialog {
+      background: var(--bg-card); border-radius: var(--radius);
+      max-width: 400px; width: 100%; padding: 1.6rem 1.5rem;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      animation: scaleIn 0.3s ease;
+    }
+    .error-dialog h3 {
+      font-family: var(--font-display); font-size: 1.4rem;
+      margin-bottom: 0.6rem; color: #c45c3e;
+    }
+    .error-dialog p {
+      font-size: 0.95rem; color: var(--text); margin-bottom: 0.8rem; line-height: 1.5;
+    }
+    .error-dialog ul {
+      margin: 0 0 1.2rem 1.1rem; font-size: 0.88rem; color: var(--text-muted);
+    }
+    .error-dialog ul li { margin-bottom: 0.35rem; }
+
   </style>
 </head>
 <body>
@@ -977,6 +1005,24 @@
     </div>
   </div>
 
+
+  <!-- SAVE ERROR DIALOG -->
+  <div class="error-dialog-overlay" id="saveErrorDialog">
+    <div class="error-dialog">
+      <h3 id="saveErrorTitle">Could not save</h3>
+      <p id="saveErrorMessage">Something went wrong while saving.</p>
+      <ul id="saveErrorTips">
+        <li>Try fewer or smaller photos</li>
+        <li>Hide or remove older projects</li>
+        <li>Export a backup, then free up space</li>
+        <li>Avoid Private Browsing on iPad</li>
+      </ul>
+      <div class="form-actions" style="justify-content:stretch;">
+        <button class="btn btn-primary" id="saveErrorOk" style="width:100%;">OK</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
   <button class="back-to-top" id="backToTop" title="Back to top">↑</button>
 
@@ -1271,9 +1317,106 @@
       }
     }
 
+    function showSaveError(title, message, tips) {
+      document.getElementById('saveErrorTitle').textContent = title || 'Could not save';
+      document.getElementById('saveErrorMessage').textContent = message || 'Something went wrong while saving your project.';
+      const ul = document.getElementById('saveErrorTips');
+      const defaultTips = [
+        'Try fewer or smaller photos',
+        'Hide or remove older projects',
+        'Export a backup, then free up space',
+        'Avoid Private Browsing on iPad/Safari'
+      ];
+      ul.innerHTML = (tips || defaultTips).map(t => '<li>' + t + '</li>').join('');
+      document.getElementById('saveErrorDialog').classList.add('open');
+      showToast(title || 'Could not save');
+    }
+
     function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-      localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+        localStorage.setItem(FAV_KEY, JSON.stringify([...favorites]));
+        return true;
+      } catch (e) {
+        console.error('Save failed:', e);
+        const isQuota = e && (
+          e.name === 'QuotaExceededError' ||
+          e.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
+          e.code === 22 ||
+          (typeof e.message === 'string' && e.message.toLowerCase().includes('quota'))
+        );
+        if (isQuota) {
+          showSaveError(
+            'Storage is full',
+            'This browser does not have enough space to save your project. Photos on iPad are often too large for browser storage.',
+            [
+              'Use 1–2 photos per project',
+              'Hide or delete older projects',
+              'Export a backup (⬇ button), then free space',
+              'Turn off Private Browsing',
+              'Try Safari or Chrome (not a private tab)'
+            ]
+          );
+        } else {
+          showSaveError(
+            'Could not save',
+            'Your project was not saved. Please try again.',
+            [
+              'Check your internet is not required — this app saves on the device',
+              'Try closing other tabs to free memory',
+              'Reload the page and sign in again',
+              'Try a different browser if it keeps failing'
+            ]
+          );
+        }
+        return false;
+      }
+    }
+
+    // Compress image for iPad / Safari localStorage limits (~5MB)
+    function compressImage(dataUrl, maxWidth, quality) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          const max = maxWidth || 1400;
+          if (w > max || h > max) {
+            if (w > h) {
+              h = Math.round(h * (max / w));
+              w = max;
+            } else {
+              w = Math.round(w * (max / h));
+              h = max;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          // JPEG is much smaller than PNG base64
+          let result = canvas.toDataURL('image/jpeg', quality || 0.72);
+          // If still huge, compress harder
+          if (result.length > 900000) {
+            result = canvas.toDataURL('image/jpeg', 0.55);
+          }
+          if (result.length > 900000) {
+            const max2 = 1000;
+            let w2 = w, h2 = h;
+            if (w2 > max2 || h2 > max2) {
+              if (w2 > h2) { h2 = Math.round(h2 * (max2 / w2)); w2 = max2; }
+              else { w2 = Math.round(w2 * (max2 / h2)); h2 = max2; }
+              canvas.width = w2; canvas.height = h2;
+              ctx.drawImage(img, 0, 0, w2, h2);
+              result = canvas.toDataURL('image/jpeg', 0.5);
+            }
+          }
+          resolve(result);
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
     }
 
     function seedSampleData() {
@@ -1788,11 +1931,25 @@
     function handleFiles(files) {
       [...files].forEach(file => {
         if (!file.type.startsWith('image/')) return;
+        // Warn on very large files
+        if (file.size > 12 * 1024 * 1024) {
+          showToast('Photo is very large and will be compressed.');
+        }
         const reader = new FileReader();
-        reader.onload = (e) => {
-          uploadedFiles.push(e.target.result);
-          renderPreviews();
+        reader.onload = async (e) => {
+          showToast('Optimizing image…');
+          try {
+            const compressed = await compressImage(e.target.result, 1400, 0.72);
+            uploadedFiles.push(compressed);
+            renderPreviews();
+            showToast('Image ready.');
+          } catch (err) {
+            uploadedFiles.push(e.target.result);
+            renderPreviews();
+            showToast('Image added (could not compress).');
+          }
         };
+        reader.onerror = () => showToast('Could not read that image. Try another photo.');
         reader.readAsDataURL(file);
       });
     }
@@ -1835,10 +1992,16 @@
       }
 
       projects.unshift(project);
-      saveData();
+      const ok = saveData();
+      if (!ok) {
+        // Roll back so UI matches what is actually stored
+        projects.shift();
+        // Error dialog already shown by saveData()
+        return;
+      }
       document.getElementById('uploadModal').classList.remove('open');
       renderAll();
-      showToast('Project added!');
+      showToast('Project saved!');
       switchView(category === 'my-art' ? 'my-art' : 'ai-art');
     }
 
@@ -2062,6 +2225,14 @@
       });
 
       document.getElementById('saveProject').addEventListener('click', saveProject);
+      document.getElementById('saveErrorOk').addEventListener('click', () => {
+        document.getElementById('saveErrorDialog').classList.remove('open');
+      });
+      document.getElementById('saveErrorDialog').addEventListener('click', (e) => {
+        if (e.target.id === 'saveErrorDialog') {
+          document.getElementById('saveErrorDialog').classList.remove('open');
+        }
+      });
       document.getElementById('submitComment').addEventListener('click', submitComment);
       document.getElementById('commentInput').addEventListener('keydown', e => {
         if (e.key === 'Enter') submitComment();
